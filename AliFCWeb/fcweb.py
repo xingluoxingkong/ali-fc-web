@@ -16,17 +16,18 @@ def fcIndex(auth = None):
         def wrapper(*args, **kw):
             environ = args[0]
             start_response = args[1]
+            http_host = environ['HTTP_HOST'] if 'HTTP_HOST' in environ else environ['REMOTE_ADDR']
             res = None
             token = None
             if auth:    # 是否需要验证权限
                 if not auth(environ):
-                    _log.warning('客户端%s请求:%s接口权限不足' % (environ['HTTP_HOST'] ,environ['fc.request_uri']))
+                    _log.warning('客户端%s请求:%s接口权限不足' % (http_host, environ['fc.request_uri']))
                     res = ResponseEntity.unauthorized('权限不足')
             
             if not res: # 登录验证和权限验证都通过了，则执行对应的方法
                 res = _run(*args, **kw)
-            _log.info('客户端%s请求:%s接口。返回结果%s' % (environ['HTTP_HOST'], environ['fc.request_uri'], res))
-            return responseFormat(res, start_response, token)
+            _log.info('客户端%s请求:%s接口。返回结果:%s' % (http_host, environ['fc.request_uri'], res))
+            return responseFormat(res, start_response)
         return wrapper
     return decorator
 
@@ -72,23 +73,27 @@ def get(pattern = None):
         return wrapper
     return decorator
 
-def post(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kw):
-        environ = args[0]
-        body = getBodyAsJson(environ)
-        return func(body)
-    wrapper.__method__ = 'POST'
-    return wrapper
+def post(no = None):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kw):
+            environ = args[0]
+            body = getBodyAsJson(environ)
+            return func(body)
+        wrapper.__method__ = 'POST'
+        return wrapper
+    return decorator
 
-def put(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kw):
-        environ = args[0]
-        body = getBodyAsJson(environ)
-        return func(body)
-    wrapper.__method__ = 'PUT'
-    return wrapper
+def put(no = None):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kw):
+            environ = args[0]
+            body = getBodyAsJson(environ)
+            return func(body)
+        wrapper.__method__ = 'PUT'
+        return wrapper
+    return decorator
 
 def delete(pattern = None):
     '''
@@ -107,10 +112,10 @@ def delete(pattern = None):
             fcInterfaceURL = requestUri.split('proxy')[1].replace('.LATEST', '')
             # 解析参数
             params = pathMatch(fcInterfaceURL, pattern)
-            if func.__code__.co_argcount == len(params):
-                res = func(**params)
-            else:
-                res = ResponseEntity.badRequest('参数数目不对，需要%d个参数，收到%d个参数' % (func.__code__.co_argcount, len(params)))
+            body = getBodyAsJson(environ)
+            if body:
+                params.update(body)
+            res = func(params)
             return res
         wrapper.__method__ = 'DELETE'
         return wrapper

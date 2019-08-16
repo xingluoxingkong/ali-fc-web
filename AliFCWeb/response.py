@@ -61,9 +61,9 @@ class ResponseEntity:
         _log.info('返回数据:%s,状态码:%s' % (self.res, self.statusCode))
 
         if isinstance(self.res, str):
-            return self.res.encode()
+            return [self.res.encode()]
         
         if isinstance(self.res, dict) or isinstance(self.res, list):
-            return json.dumps(self.res).encode()
+            return [json.dumps(self.res).encode()]
         
-        return str(self.res).encode()
+        return [str(self.res).encode()]

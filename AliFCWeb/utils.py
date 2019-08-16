@@ -17,7 +17,7 @@ def getBodyAsJson(environ):
         request_body_size = int(environ.get('CONTENT_LENGTH', 0))
     except (ValueError):
         request_body_size = 0
-    return json.loads(environ['wsgi.input'].read(request_body_size))
+    return json.loads(environ['wsgi.input'].read(request_body_size)) if request_body_size > 0 else None
 
 def getBodyAsStr(environ):
     ''' 获取string格式的请求体
@@ -28,18 +28,18 @@ def getBodyAsStr(environ):
         request_body_size = 0
     return environ['wsgi.input'].read(request_body_size)
 
-def responseFormat(responseEntitys, start_response):
+def responseFormat(responseEntity, start_response):
     ''' 格式化返回数据
     :param res 返回数据
     :param start_response 函数计算的start_response
     :return 按照函数计算的格式返回数据
     '''
-    if not isinstance(responseEntitys, ResponseEntity):
+    if not isinstance(responseEntity, ResponseEntity):
         err = TypeError('只支持ResponseEntity格式的返回值')
         _log.error(err)
-        raise err
+        raise [('%s' % err).encode()]
     
-    return responseEntitys.build(start_response)
+    return responseEntity.build(start_response)
 
 def pathMatch(path, pattern = None):
     ''' 解析路径
