@@ -1,0 +1,12 @@
+*.env
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+__pycache__
+node_modules
+dist
+doc
+*.egg-info
