@@ -1,8 +1,9 @@
-# 函数计算工具库
+# 函数计算web
 
 ## 安装
 ``` shell
 pip install AliFCWeb
+fun install --save --runtime python3 --package-type pip AliFCWeb
 ```
 
 ## 使用
