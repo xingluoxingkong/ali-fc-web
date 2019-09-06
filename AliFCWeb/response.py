@@ -41,6 +41,12 @@ class ResponseEntity:
         '''
         return ResponseEntity('404', res)
     
+    @staticmethod
+    def serverError(res):
+        ''' 500, 服务器错误
+        '''
+        return ResponseEntity('500', res)
+    
     def header(self, response_headers = [('Content-type', 'application/json')]):
         ''' 自定义HTTP头
         '''
@@ -54,7 +60,6 @@ class ResponseEntity:
     def build(self, start_response):
         ''' 生成请求
         :param start_response 函数计算的start_response
-        :param token 返回给用户的token
         '''
         start_response(self.statusCode, self.response_headers)
 
