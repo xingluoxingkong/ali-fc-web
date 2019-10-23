@@ -9,13 +9,17 @@ from .right import isLogin, updateToken, getTokenFromHeader, authRight, getBodyA
 
 _log = logging.getLogger()
 
-def fcIndex(debug = False):
-    ''' 程序入口，拦截原函数计算入口，使用方法如下：
+def dscFcIndex(debug = False):
+    ''' 程序入口，拦截原函数计算入口，分发到对应的文件下，使用方法如下：
     --
-        @fcIndex(debug = True)
-        def handler(environ, start_response):
-            pass
-        
+        @example
+            @dscFcIndex(debug = True)
+            def handler(environ, start_response):
+                pass
+            
+            当前函数计算的地址为：
+                <account_id>.<region>.fc.aliyuncs.com/<version>/proxy/<serviceName>/<functionName>/[action?queries]
+
         @param debug 可选参数,是否是调试模式，默认False
     '''
     def decorator(func):

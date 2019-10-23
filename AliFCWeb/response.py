@@ -1,15 +1,15 @@
-
 import json
-import logging
-
-_log = logging.getLogger()
+from .right import encodeToken
+from fcutils import dataToJson
 
 class ResponseEntity:
 
-    def __init__(self, statusCode, res = None):
+    def __init__(self, statusCode, res = None, token = None):
         self.statusCode = statusCode
         self.res = res
         self.response_headers = [('Content-type', 'application/json')]
+        self.token = token
+        self.num = -1
 
     @staticmethod
     def status(statusCode):
@@ -51,24 +51,57 @@ class ResponseEntity:
         ''' 自定义HTTP头
         '''
         self.response_headers = response_headers
+        return self
     
     def body(self, res):
         ''' 自定义HTTP内容
         '''
         self.res = res
+        return self
 
-    def build(self, start_response):
+    def setToken(self, token):
+        ''' 自定义token
+        '''
+        self.token = token
+        return self
+    
+    def setNum(self, num):
+        ''' 自定义num
+        '''
+        self.num = num
+        return self
+    
+    def build(self, start_response, token = None):
         ''' 生成请求
-        :param start_response 函数计算的start_response
+        :param start_response 函数计算的token
+        :param token 返回给用户的token
         '''
         start_response(self.statusCode, self.response_headers)
+        response = {}
 
-        _log.info('返回数据:%s,状态码:%s' % (self.res, self.statusCode))
+        data = {}
+        if isinstance(self.res, list):
+            if self.num != -1:
+                n = self.num
+            data = {'sum':len(self.res) if self.num == -1 else self.num, 'list':self.res}
+        elif isinstance(self.res, str):
+            data = {'msg': self.res}
+        else :
+            data = self.res
 
-        if isinstance(self.res, str):
-            return [self.res.encode()]
+        if self.statusCode == '200':
+            response['message'] = 'success'
+            # 优先使用自定义Token
+            if self.token:
+                response['token'] = encodeToken(self.token)
+            elif token:
+                response['token'] = encodeToken(token)
+        else:
+            response['message'] = 'fail'
         
-        if isinstance(self.res, dict) or isinstance(self.res, list):
-            return [json.dumps(self.res).encode()]
-        
-        return [str(self.res).encode()]
+        response['data'] = data
+
+        return response
+
+    def __str__(self):
+        return json.dumps({'status':self.statusCode, 'res':dataToJson(self.res)}) 
