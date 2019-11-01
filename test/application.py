@@ -1,5 +1,4 @@
 conf_center = {
         'url': 'config/config/', 
-        'pwd': ''
+        'pwd': '123456'
     }
-sql_name = 'sql'

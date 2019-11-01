@@ -73,7 +73,7 @@ def init(environ, start_response):
     try:
         confCenter = getConfig(CONF_CENTER_NAME)
         if not confCenter:
-            raise Exception('配置中心的url和pwd必须配置')
+            confCenter = {'url': 'config/config/', 'pwd': '123456'}
 
         if not confCenter['url'].startswith('http'):
             environ = getEnviron(FC_ENVIRON)

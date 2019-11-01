@@ -8,7 +8,6 @@
 OK = '1'
 NO = '0'
 ALL = '-1'
-CONF_HOST = 'https://1921668875657123.cn-zhangjiakou.fc.aliyuncs.com/2016-08-15/proxy/ly-config/getConfigByName/'
 #######################支付相关的常量#######################
 # 支付回调地址
 NOTIFY_URL = 'https://1837732264572668.cn-shanghai.fc.aliyuncs.com/2016-08-15/proxy/ly-order/notifyPay/'
