@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "AliFCWeb",
-    version = "0.1.2",
+    version = "0.2.0",
     keywords = ("pip", "pathtool","timetool", "magetool", "mage"),							
     description = "阿里云函数计算web框架",
     long_description = "简易的阿里云函数计算web框架",

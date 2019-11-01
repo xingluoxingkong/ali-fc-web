@@ -1,3 +1,8 @@
+######################################
+#
+# 发送http请求工具
+#
+######################################
 import requests
 import datetime
 
@@ -32,3 +37,11 @@ def aMonthlater(day = 30):
     """
     month_time = (datetime.datetime.now() + datetime.timedelta(days=day)).strftime("%a, %d %b %Y %H:%M:%S GMT")
     return month_time
+
+if __name__ == "__main__":
+    res = getDataForJson('https://1921668875657123.cn-zhangjiakou.fc.aliyuncs.com/2016-08-15/proxy/ly-config/config/', 
+                {
+  "pwd":"WCeHihjdLKoV",
+  "configName":"sql"
+})
+    print(res)

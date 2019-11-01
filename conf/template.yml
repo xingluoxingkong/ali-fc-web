@@ -1,0 +1,29 @@
+ROSTemplateFormatVersion: '2015-09-01'
+Transform: 'Aliyun::Serverless-2018-04-03'
+Resources:
+  config:
+    Type: 'Aliyun::Serverless::Service'
+    Properties:
+      Description: 配置中心
+      InternetAccess: true
+    config:
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Handler: index.handler
+        Runtime: python3
+        Timeout: 3
+        MemorySize: 128
+        EnvironmentVariables:
+          LD_LIBRARY_PATH: >-
+            /code/.fun/root/usr/lib:/code/.fun/root/usr/lib/x86_64-linux-gnu:/code:/code/lib:/usr/local/lib
+          PATH: >-
+            /code/.fun/root/usr/local/bin:/code/.fun/root/usr/local/sbin:/code/.fun/root/usr/bin:/code/.fun/root/usr/sbin:/code/.fun/root/sbin:/code/.fun/root/bin:/code/.fun/python/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/bin
+          PYTHONUSERBASE: /code/.fun/python
+        CodeUri: .
+      Events:
+        httpTrigger:
+          Type: HTTP
+          Properties:
+            AuthType: anonymous
+            Methods:
+              - POST

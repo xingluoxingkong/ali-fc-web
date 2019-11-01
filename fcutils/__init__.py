@@ -1,5 +1,10 @@
-__version__ = '0.4.0'
-
+__version__ = '0.4.1'
+from .acs_utils import (
+    sendMessage
+)
+from .conf_utils import (
+    getConfig, getConfigFromConfCenter
+)
 from .http_utils import (
     getData, getDataForJson, getDataForStr
 )
@@ -12,11 +17,6 @@ from .oss_utils import (
 from .pwd_utils import (
     createPwd, createSalt
 )
-
 from .sql_utils import (
-    joinList, pers, fieldStrFromList, fieldStr, fieldSplit, toJson, fieldStrAndPer
-)
-
-from .utils import (
-    dataToJson, dataToStr
+    joinList, pers, fieldStrFromList, fieldStr, fieldStrAndPer, fieldSplit, toJson, dataToJson, dataToStr
 )

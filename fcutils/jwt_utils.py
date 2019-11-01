@@ -1,3 +1,8 @@
+######################################
+#
+# 进行jwt加解密工具
+#
+######################################
 import jwt
 import time
 from jwt.exceptions import DecodeError
