@@ -4,12 +4,14 @@ import functools
 import importlib
 from inspect import isfunction
 from .response import ResponseEntity
-from .constant import getEnviron, FC_ENVIRON, FC_START_RESPONSE
-from .right import isLogin, updateToken, getTokenFromHeader, authRight, getBodyAsJson, getBodyAsStr
+from .constant import getConfByName, FC_ENVIRON, FC_START_RESPONSE
+from .right import isLogin, updateToken, getTokenFromHeader
+
+__all__ = ['fcIndex', 'get', 'post', 'put', 'delete']
 
 _log = logging.getLogger()
 
-def fcIndex(debug = False):
+def fcIndex(debug = False): 
     ''' 程序入口，拦截原函数计算入口，使用方法如下：
     --
         @fcIndex(debug = True)
@@ -32,19 +34,20 @@ def fcIndex(debug = False):
                 return _run()
             except Exception as e:
                 _log.error(e)
+                res = None
                 if debug:
-                    return e
+                    res = ResponseEntity.badRequest(e)
                 else:
-                    res = ResponseEntity.serverError('服务器发生错误，请联系管理员查看系统日志!')
-                    return _responseFormat(res)
+                    res = ResponseEntity.badRequest('服务器发生错误，请联系管理员查看系统日志!')
+                return _responseFormat(res)
         return wrapper
     return decorator
 
 def _run():
     ''' 根据请求类型（GET，POST）执行对应的方法
     '''
-    environ = getEnviron(FC_ENVIRON)
-    start_response = getEnviron(FC_START_RESPONSE)
+    environ = getConfByName(FC_ENVIRON)
+    start_response = getConfByName(FC_START_RESPONSE)
     request_method = environ['REQUEST_METHOD']
 
     # 获取方法列表
@@ -58,7 +61,7 @@ def _run():
         res = ResponseEntity.badRequest('请求类型不支持！') 
         return _responseFormat(res)
 
-def get(pattern = None, login = False, auth = False, uToken = False):
+def get(pattern = None, login = False, auth = None, uToken = False):
     ''' 使用方法
     --
         @get(pattern="/ly-test/test/{id}", login = True, auth = True, uToken = True)
@@ -71,7 +74,7 @@ def get(pattern = None, login = False, auth = False, uToken = False):
                                  pattern = '/demo/getUserById/{id}'
                                  解析后会自动填充参数id=1
         @param login 可选参数。是否需要登录，默认False
-        @param auth 可选参数。是否需要鉴权，默认False
+        @param auth 可选参数。鉴权函数。此函数接收一个参数token，返回true则鉴权通过，返回false则鉴权失败
         @param uToken 可选参数。是否更新token，默认False
     '''
     def decorator(func):
@@ -82,7 +85,7 @@ def get(pattern = None, login = False, auth = False, uToken = False):
         return wrapper
     return decorator
 
-def post(pattern = None, login = False, auth = False, uToken = False):
+def post(pattern = None, login = False, auth = None, uToken = False):
     ''' 使用方法
     --
         @post(pattern="/ly-test/test/{id}", login = True, auth = True, uToken = True)
@@ -95,7 +98,7 @@ def post(pattern = None, login = False, auth = False, uToken = False):
                                  pattern = '/demo/getUserById/{id}'
                                  解析后会自动填充参数id=1
         @param login 可选参数。是否需要登录，默认False
-        @param auth 可选参数。是否需要鉴权，默认False
+        @param auth 可选参数。鉴权函数。此函数接收一个参数token，返回true则鉴权通过，返回false则鉴权失败
         @param uToken 可选参数。是否更新token，默认False
     '''
     def decorator(func):
@@ -106,7 +109,7 @@ def post(pattern = None, login = False, auth = False, uToken = False):
         return wrapper
     return decorator
 
-def put(pattern = None, login = False, auth = False, uToken = False):
+def put(pattern = None, login = False, auth = None, uToken = False):
     ''' 使用方法
     --
         @put(pattern="/ly-test/test/{id}", login = True, auth = True, uToken = True)
@@ -119,7 +122,7 @@ def put(pattern = None, login = False, auth = False, uToken = False):
                                  pattern = '/demo/getUserById/{id}'
                                  解析后会自动填充参数id=1
         @param login 可选参数。是否需要登录，默认False
-        @param auth 可选参数。是否需要鉴权，默认False
+        @param auth 可选参数。鉴权函数。此函数接收一个参数token，返回true则鉴权通过，返回false则鉴权失败
         @param uToken 可选参数。是否更新token，默认False
     '''
     def decorator(func):
@@ -130,7 +133,7 @@ def put(pattern = None, login = False, auth = False, uToken = False):
         return wrapper
     return decorator
 
-def delete(pattern = None, login = False, auth = False, uToken = False):
+def delete(pattern = None, login = False, auth = None, uToken = False):
     ''' 使用方法
     --
         @delete(pattern="/ly-test/test/{id}", login = True, auth = True, uToken = True)
@@ -143,7 +146,7 @@ def delete(pattern = None, login = False, auth = False, uToken = False):
                                  pattern = '/demo/getUserById/{id}'
                                  解析后会自动填充参数id=1
         @param login 可选参数。是否需要登录，默认False
-        @param auth 可选参数。是否需要鉴权，默认False
+        @param auth 可选参数。鉴权函数。此函数接收一个参数token，返回true则鉴权通过，返回false则鉴权失败
         @param uToken 可选参数。是否更新token，默认False
     '''
     def decorator(func):
@@ -160,8 +163,8 @@ def _commonHttpEntry(pattern, func, login = False, auth = False, uToken = False)
     '''
     res = None
     newToken = None
-    environ = getEnviron(FC_ENVIRON)
-    start_response = getEnviron(FC_START_RESPONSE)
+    environ = getConfByName(FC_ENVIRON)
+    start_response = getConfByName(FC_START_RESPONSE)
     
     http_host = environ['HTTP_HOST'] if 'HTTP_HOST' in environ else environ['REMOTE_ADDR']
 
@@ -171,7 +174,7 @@ def _commonHttpEntry(pattern, func, login = False, auth = False, uToken = False)
             _log.warning('客户端%s请求:%s接口权限不足' % (http_host, environ['fc.request_uri']))
             res = ResponseEntity.unauthorized('用户未登录，或登录已过期')
     if auth:    # 是否需要验证权限
-        if not authRight(oldToken):
+        if not auth(oldToken):
             _log.warning('客户端%s请求:%s接口权限不足' % (http_host ,environ['fc.request_uri']))
             res = ResponseEntity.unauthorized('权限不足')
     if uToken: # 是否需要更新token
@@ -190,23 +193,24 @@ def _commonHttp(pattern, func):
     --
     '''
     # 获取接口地址
-    environ = getEnviron(FC_ENVIRON)
-    start_response = getEnviron(FC_START_RESPONSE)
+    environ = getConfByName(FC_ENVIRON)
+    start_response = getConfByName(FC_START_RESPONSE)
     requestUri = environ['fc.request_uri']
     fcInterfaceURL = requestUri.split('proxy')[1].replace('.LATEST', '')
     # 解析参数
-    from .utils import pathMatch
+    from .utils import pathMatch, getBody
     params = pathMatch(fcInterfaceURL, pattern)
-    body = {}
-    try:
-        body = getBodyAsJson()
-    except :
-        body = getBodyAsStr()
+    body = getBody()
     
     if params == None:
         params = {}
     if body:
-        params.update(body)
+        if not params:
+            params = body
+        elif isinstance(body, dict):
+            params.update(body)
+        else:
+            params['body'] = body
     res = func(params)
     return res
 
@@ -216,11 +220,12 @@ def _getFuncs():
         @param environ 函数计算的environ
         @return {'GET':get方法, 'POST':post方法, 'PUT':put方法, 'DELETE':delete方法}
     '''
-    environ = getEnviron(FC_ENVIRON)
+    environ = getConfByName(FC_ENVIRON)
     context = environ['fc.context']
     function = getattr(context, 'function')
     handler = getattr(function, 'handler')
     modName = handler.split('.')[0]
+    modName = modName.replace('/', '.')
     mod = importlib.import_module(modName)
     # mod = __import__(modName, globals(), locals())
     funcs = {}
@@ -238,17 +243,14 @@ def _getFuncs():
             setattr(mod, attr, fn.replace())
     return funcs
 
-def _responseFormat(responseEntitys, token = None):
-    ''' 格式化返回数据
+def _responseFormat(responseEntity, token = None):
+    ''' 获取返回数据
     --
         :param res 返回数据
         :param token 用户token
         :return 按照函数计算的格式返回数据
     '''
-    if not isinstance(responseEntitys, ResponseEntity):
+    if not isinstance(responseEntity, ResponseEntity):
         raise TypeError('只支持ResponseEntity格式的返回值')
     
-    res = responseEntitys.build(token)
-    from fcutils import dataToJson
-    codeRes = dataToJson(res)
-    return [json.dumps(codeRes).encode()]
+    return responseEntity.build(token)

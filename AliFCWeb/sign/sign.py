@@ -2,12 +2,14 @@ import abc
 import json
 import pymysql
 import importlib
-from fcutils import getConfig, getConfigFromConfCenter
+from AliFCWeb.fcutils import getConfigFromConfCenter
+
+__all__ = ['Sign', 'DBSign', 'RedisSign']
 
 class Sign(metaclass = abc.ABCMeta):
 
     def __init__(self, func, *args, **kw):
-        ''' 用于标记实际运行时需要被替换的方法，使用时继承该类并在replace方法中书写实际的运行方法
+        ''' 用于全局变量的赋值，使用时继承该类并在replace方法中书写实际的运行方法
         --
         '''
         self.func = func
@@ -33,9 +35,9 @@ class DBSign(Sign):
     def replace(self):
         '''@param environ: 函数计算环境变量
         '''
-        from .constant import getEnviron, FC_ENVIRON, CONF_CENTER_NAME, SQL_CONF_FILE_NAME
-        environ = getEnviron(FC_ENVIRON)
-        confCenter = getEnviron(CONF_CENTER_NAME)
+        from AliFCWeb.constant import getConfByName, FC_ENVIRON, CONF_CENTER_NAME, SQL_CONF_FILE_NAME
+        environ = getConfByName(FC_ENVIRON)
+        confCenter = getConfByName(CONF_CENTER_NAME)
 
         res = getConfigFromConfCenter(confCenter['url'], SQL_CONF_FILE_NAME, confCenter['pwd'] )
         if res.status_code != 200:
@@ -57,9 +59,9 @@ class RedisSign(Sign):
     def replace(self):
         '''@param environ: 函数计算环境变量
         '''
-        from .constant import getEnviron, FC_ENVIRON, CONF_CENTER_NAME, SQL_CONF_FILE_NAME
-        environ = getEnviron(FC_ENVIRON)
-        confCenter = getEnviron(CONF_CENTER_NAME)
+        from AliFCWeb.constant import getConfByName, FC_ENVIRON, CONF_CENTER_NAME, SQL_CONF_FILE_NAME
+        environ = getConfByName(FC_ENVIRON)
+        confCenter = getConfByName(CONF_CENTER_NAME)
 
         res = getConfigFromConfCenter(confCenter['url'], SQL_CONF_FILE_NAME, confCenter['pwd'] )
         if res.status_code != 200:

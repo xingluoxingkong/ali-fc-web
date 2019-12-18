@@ -7,6 +7,8 @@ import json
 import importlib
 from .http_utils import getDataForStr
 
+__all__ = ['getConfig', 'getConfigFromConfCenter']
+
 def getConfig(names, configFileName = 'application'):
     ''' 读取本地配置文件
     --

@@ -1,11 +1,13 @@
-__version__ = '0.5.0'
+__version__ = '0.7.0'
+
+from .config_center import configCenter
 
 from .connect import (
-    dbConn, redisConn, userCode2Session, guideCode2Session
+    dbConn, redisConn
 )
 
 from .constant import (
-    getConfByName, getEnviron
+    getConfByName
 )
 
 from .fcweb import (
@@ -15,9 +17,7 @@ from .fcweb import (
 from .response import ResponseEntity
 
 from .right import (
-    getTokenFromHeader, getPayloadFromHeader, getBodyAsJson, getBodyAsStr
+    getTokenFromHeader, getPayloadFromHeader
 )
 
-from .utils import createId
-
-from .sign import Sign
+from .utils import createId, getBody, getBodyAsJson, getBodyAsStr

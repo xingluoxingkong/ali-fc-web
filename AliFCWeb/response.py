@@ -1,72 +1,108 @@
 import json
 from .right import encodeToken
-from .constant import getEnviron, FC_START_RESPONSE
+from .fcutils import dataToJson, dict2xml
+from .constant import getConfByName, FC_START_RESPONSE
+
+__all__ = ['ResponseEntity']
 
 class ResponseEntity:
 
-    def __init__(self, statusCode, res = None, token = None):
+    def __init__(self, statusCode, res = None, token = None, resType = 'json', response_headers= [('Content-type', 'application/json')]):
+        ''' 返回数据封装
+        --
+            @param statusCode: http代码
+            @param res: 返回的数据【dict, list, str】
+            @param token: token
+            @param resType: 返回数据的编码类型【json, xml】
+            @param response_headers: 设置返回头
+        '''
         self.statusCode = statusCode
         self.res = res
-        self.response_headers = [('Content-type', 'application/json')]
+        self.response_headers = response_headers
         self.token = token
         self.num = -1
+        self.resType = resType
 
     @staticmethod
     def status(statusCode):
         ''' 自定义状态
+        --
         '''
         return ResponseEntity(statusCode)
 
     @staticmethod
     def ok(res):
         ''' 200，成功
+        --
         '''
         return ResponseEntity('200', res)
+    
+    @staticmethod
+    def responseXml(res):
+        ''' 返回xml
+        --
+        '''
+        return ResponseEntity('200', res, resType='xml')
 
     @staticmethod
     def badRequest(res):
         ''' 400，错误请求
+        --
         '''
         return ResponseEntity('400', res)
 
     @staticmethod
     def unauthorized(res):
         ''' 401，权限不足
+        --
         '''
         return ResponseEntity('401', res)
 
     @staticmethod
     def notFound(res):
         ''' 404，未找到
+        --
         '''
         return ResponseEntity('404', res)
     
     @staticmethod
     def serverError(res):
         ''' 500, 服务器错误
+        --
         '''
         return ResponseEntity('500', res)
     
     def header(self, response_headers = [('Content-type', 'application/json')]):
         ''' 自定义HTTP头
+        --
         '''
         self.response_headers = response_headers
         return self
     
     def body(self, res):
         ''' 自定义HTTP内容
+        --
         '''
         self.res = res
         return self
 
+    def setResType(self, resType):
+        ''' 设置返回值类型
+        --
+        '''
+        self.resType = resType
+        return self
+
     def setToken(self, token):
         ''' 自定义token
+        --
         '''
         self.token = token
         return self
     
     def setNum(self, num):
         ''' 自定义num
+        --
         '''
         self.num = num
         return self
@@ -75,19 +111,23 @@ class ResponseEntity:
         ''' 生成请求
         :param token 返回给用户的token
         '''
-        start_response = getEnviron(FC_START_RESPONSE)
+        start_response = getConfByName(FC_START_RESPONSE)
         start_response(self.statusCode, self.response_headers)
+        
         response = {}
-
         data = {}
         if isinstance(self.res, list):
-            if self.num != -1:
-                n = self.num
             data = {'sum':len(self.res) if self.num == -1 else self.num, 'list':self.res}
         elif isinstance(self.res, str):
-            data = {'msg': self.res}
-        else :
             data = self.res
+        elif isinstance(self.res, dict) :
+            if self.resType == 'json':
+                data = self.res
+            elif self.resType == 'xml':
+                xml = dict2xml.Dict2XML()
+                data = xml.parse(self.res)
+        else:
+            raise Exception('ResponseEntity类只能编译list,dict,str类型的返回值。如需自定义返回值，请继承ResponseEntity并重写build方法')
 
         if self.statusCode == '200':
             response['message'] = 'success'
@@ -101,8 +141,8 @@ class ResponseEntity:
         
         response['data'] = data
 
-        return response
+        codeRes = dataToJson(response)
+        return [json.dumps(codeRes).encode()]
 
     def __str__(self):
-        from fcutils import dataToJson
         return json.dumps({'status':self.statusCode, 'res':dataToJson(self.res)}) 

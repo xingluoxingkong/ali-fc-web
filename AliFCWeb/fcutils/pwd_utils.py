@@ -1,6 +1,7 @@
 import hashlib
 from random import Random 
 
+__all__ = ['createPwd', 'createSalt']
 
 def createPwd(password, salt):
     ''' 生成加密密码

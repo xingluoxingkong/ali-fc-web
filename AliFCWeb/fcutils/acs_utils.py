@@ -7,7 +7,10 @@ import json
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
 
-def sendMessage(accessKeyId, accessSecret, phoneNumbers, signName, templateCode, templateParam):
+__all__ = ['sendMessage']
+
+
+def sendMessage(accessKeyId, accessSecret, phoneNumbers, signName, templateCode, templateParam=None):
     ''' 发送短信
     --
         @param accessKeyId: accessKeyId
@@ -34,8 +37,8 @@ def sendMessage(accessKeyId, accessSecret, phoneNumbers, signName, templateCode,
             tp = json.dumps({'code': templateParam})
     elif isinstance(templateParam, dict):
         tp = json.dumps(templateParam)
-    else:
-        return None
+    # else:
+    #     return None
 
     client = AcsClient(accessKeyId, accessSecret, 'cn-hangzhou')
 
@@ -50,6 +53,7 @@ def sendMessage(accessKeyId, accessSecret, phoneNumbers, signName, templateCode,
     request.add_query_param('PhoneNumbers', phoneNumbers)
     request.add_query_param('SignName', signName)
     request.add_query_param('TemplateCode', templateCode)
-    request.add_query_param('TemplateParam', tp)
+    if tp:
+        request.add_query_param('TemplateParam', tp)
     response = client.do_action(request)
     return response

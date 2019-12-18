@@ -1,5 +1,11 @@
 import oss2
 
+__all__ = ['OSSUtils', 'ShanghaiOSS',
+           'HangzhouOSS', 'QingdaoOSS',
+           'BeijingOSS', 'ZhangjiakouOSS',
+           'HuhehaoteOSS', 'ShenzhenOSS',
+           'ChengduOSS', 'HongkongOSS']
+
 _SHANGHAI = 'https://oss-cn-shanghai.aliyuncs.com'
 _HANGZHOU = 'https://oss-cn-hangzhou.aliyuncs.com'
 _QINGDAO = 'https://oss-cn-qingdao.aliyuncs.com'
