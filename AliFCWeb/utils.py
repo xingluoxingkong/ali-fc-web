@@ -102,6 +102,7 @@ def getBody():
     except (ValueError):
         request_body_size = 0
     data = environ['wsgi.input'].read(request_body_size)
+    data = data.decode('utf-8')
     try:
         return json.loads(data)
     except Exception as e:

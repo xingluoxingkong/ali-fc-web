@@ -267,42 +267,52 @@ class Example(object):
                     else:
                         sign = s
                     continue
-                else:
-                    s = s.replace('`', '')
-                    if '=' in s and '=' != s:
-                        sign = '='
-                        key, value = s.split('=')
-                    elif '<>' in s and '<>' != s:
-                        sign = '<>'
-                        key, value = s.split('<>')
-                    elif '>' in s and '>' != s:
-                        sign = '>'
-                        key, value = s.split('>')
-                    elif '<' in s and '<' != s:
-                        sign = '<'
-                        key, value = s.split('<')
-                    elif '>=' in s and '>=' != s:
-                        sign = '>='
-                        key, value = s.split('>=')
-                    elif '<=' in s and '<=' != s:
-                        sign = '<='
-                        key, value = s.split('<=')
+                elif s.upper().startswith('IN'):
+                    if haveNot:
+                        sign = 'NOT ' + s
                     else:
-                        if sign and key:
-                            if sign.upper() == 'BETWEEN' or sign.upper() == 'NOT BETWEEN':
-                                if value:
-                                    value.append(s)
-                                else:
-                                    value = [s]
-                                    continue
+                        sign = 'IN'
+                    s = s[2:]
+                    if len(s) > 2:
+                        s = s[1:-1]
+                    else:
+                        continue
+               
+                s = s.replace('`', '')
+                if '=' in s and '=' != s:
+                    sign = '='
+                    key, value = s.split('=')
+                elif '<>' in s and '<>' != s:
+                    sign = '<>'
+                    key, value = s.split('<>')
+                elif '>' in s and '>' != s:
+                    sign = '>'
+                    key, value = s.split('>')
+                elif '<' in s and '<' != s:
+                    sign = '<'
+                    key, value = s.split('<')
+                elif '>=' in s and '>=' != s:
+                    sign = '>='
+                    key, value = s.split('>=')
+                elif '<=' in s and '<=' != s:
+                    sign = '<='
+                    key, value = s.split('<=')
+                else:
+                    if sign and key:
+                        if sign.upper() == 'BETWEEN' or sign.upper() == 'NOT BETWEEN':
+                            if value:
+                                value.append(s)
                             else:
-                                value = s
-                        elif key:
-                            sign = s
-                            continue
+                                value = [s]
+                                continue
                         else:
-                            key = s
-                            continue
+                            value = s
+                    elif key:
+                        sign = s
+                        continue
+                    else:
+                        key = s
+                        continue
 
             if not sign:
                 self._append(keyword, Example().whereFromStr(value))
@@ -313,7 +323,9 @@ class Example(object):
                 print((keyword, (key, value, sign)))
                 self._append(keyword, (key, value, sign))
             else:
-                if isinstance(value, str) and value.startswith('"') and value.endswith('"') and len(value) > 1:
+                if isinstance(value, str) and value.startswith('"') and value.endswith('"') and len(value) > 2:
+                    value = value[1:-1]
+                elif isinstance(value, str) and value.startswith("'") and value.endswith("'") and len(value) > 2:
                     value = value[1:-1]
                 value = value
                 self._append(keyword, (key, value, sign))

@@ -1,6 +1,6 @@
 import logging
 from .constant import AUTO_INCREMENT_KEYS, PRIMARY_KEY
-from AliFCWeb.fcutils import fieldStrAndPer, fieldSplit, joinList, pers, dataToStr
+from fcweb.fcutils import fieldStrAndPer, fieldSplit, joinList, pers, dataToStr
 
 __all__ = ['Orm']
 
@@ -198,7 +198,7 @@ class Orm(object):
             
             keys, ps, values = fieldSplit(data)
             sql = 'INSERT INTO `{}`({}) VALUES({})'.format(self.tableName, keys, ps)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.execute(sql, values)
             lastId = cursor.lastrowid
             if self.auto_commit:
@@ -264,7 +264,7 @@ class Orm(object):
                         dataList.append(self.generator())
 
             sql = 'INSERT INTO `{}`({}) VALUES({})'.format(self.tableName, joinList(columns), pers(len(columns)))
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, dataList))
             if isinstance(dataList[0], list):
                 cursor.executemany(sql, dataList)
             else:
@@ -305,7 +305,7 @@ class Orm(object):
                 values.append(vs)
             
             sql = 'INSERT INTO `{}`({}) VALUES({})'.format(self.tableName, keys, ps)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.executemany(sql, values)
             lastId = cursor.lastrowid
             if self.auto_commit:
@@ -347,7 +347,7 @@ class Orm(object):
             fieldStr, values = fieldStrAndPer(data)
             values.append(primaryValue)
             sql = 'UPDATE `{}` SET {} WHERE `{}`=%s'.format(self.tableName, fieldStr, self.keyProperty)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             res = cursor.execute(sql, values)
             if self.auto_commit:
                 self.conn.commit()
@@ -385,7 +385,7 @@ class Orm(object):
             fieldStr, values2 = fieldStrAndPer(data)
             values2.extend(values1)
             sql = 'UPDATE `{}` SET {} WHERE {}'.format(self.tableName, fieldStr, whereStr)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values2))
             res = cursor.execute(sql, values2)
             if self.auto_commit:
                 self.conn.commit()
@@ -525,7 +525,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr
             }
             sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} {groupByStr} {orderByStr}'''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}'.format(sql))
             cursor.execute(sql)
             res = cursor.fetchall()
             if self.auto_commit:
@@ -558,7 +558,7 @@ class Orm(object):
             sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, primaryValue))
             cursor.execute(sql, primaryValue)
             res = cursor.fetchone()
             if self.auto_commit:
@@ -591,7 +591,7 @@ class Orm(object):
             sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.execute(sql, values)
             res = cursor.fetchall()
             # if res and len(res) == 1:
@@ -631,7 +631,7 @@ class Orm(object):
             sql = '''SELECT {distinctStr} {propertiesStr} , {countStr} FROM {tableName} {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.execute(sql, values)
             res = cursor.fetchall()
             if self.auto_commit:
@@ -675,7 +675,7 @@ class Orm(object):
             sql = '''SELECT {distinctStr} {propertiesStr} , {countStr} FROM {tableName} {joinStr} 
                 WHERE {whereStr} {groupByStr} {havingStr} {orderByStr}
                 '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.execute(sql, values)
             res = cursor.fetchall()
             if self.auto_commit:
@@ -708,7 +708,7 @@ class Orm(object):
             sql = '''SELECT COUNT(`{propertiesStr}`) num FROM {tableName} {joinStr} 
                     {groupByStr} {orderByStr}
                     '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}'.format(sql))
             cursor.execute(sql)
             numRes = cursor.fetchone()
             num = numRes['num']
@@ -728,7 +728,7 @@ class Orm(object):
             sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                     {groupByStr} {orderByStr} {limitStr}
                     '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}'.format(sql))
             cursor.execute(sql)
             res = cursor.fetchall()
             if self.auto_commit:
@@ -763,7 +763,7 @@ class Orm(object):
             sql = '''SELECT COUNT({propertiesStr}) num FROM {tableName} {joinStr} 
                     WHERE {whereStr} {groupByStr} {orderByStr}
                     '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.execute(sql, values)
             numRes = cursor.fetchone()
             num = numRes['num']
@@ -785,7 +785,7 @@ class Orm(object):
             sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                     WHERE {whereStr} {groupByStr} {orderByStr} {limitStr}
                     '''.format(**strDict)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.execute(sql, values)
             res = cursor.fetchall()
             if self.auto_commit:
@@ -809,7 +809,7 @@ class Orm(object):
         cursor = self.conn.cursor()
         try:
             sql = 'DELETE FROM `{}` WHERE `{}`=%s'.format(self.tableName, self.keyProperty)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, primaryValue))
             res = cursor.execute(sql, primaryValue)
             if self.auto_commit:
                 self.conn.commit()
@@ -831,7 +831,7 @@ class Orm(object):
         try:
             whereStr, values = example.whereBuilder()
             sql = 'DELETE FROM `{}` WHERE {}'.format(self.tableName, whereStr)
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             res = cursor.execute(sql, values)
             if self.auto_commit:
                 self.conn.commit()
@@ -851,7 +851,7 @@ class Orm(object):
         cursor = self.conn.cursor()
 
         try:
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             if values:
                 cursor.execute(sql, values)
             else:
@@ -874,7 +874,7 @@ class Orm(object):
         cursor = self.conn.cursor()
 
         try:
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             if values:
                 cursor.execute(sql, values)
             else:
@@ -899,7 +899,7 @@ class Orm(object):
         '''
         cursor = self.conn.cursor()
         try:
-            _log.info(sql)
+            _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             if values:
                 cursor.execute(sql, values)
             else:

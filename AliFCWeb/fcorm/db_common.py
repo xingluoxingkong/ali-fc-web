@@ -25,7 +25,7 @@ def dbCommon(pwd = '123456', privateTables = []):
         def wrapper(*args, **kw):
             environ = args[0]
             start_response = args[1]
-            environ['fc.context'].function.handler = 'AliFCWeb/fcorm/db_common'
+            environ['fc.context'].function.handler = 'fcweb/fcorm/db_common'
             res = _index(environ, start_response)
             return res
         return wrapper
@@ -90,18 +90,7 @@ def _get(params):
         orm.setSelectProperties(columns)
 
     if tableId > 0:  # 按主键查询
-        res = None
-        if where:
-            example = Example().whereFromStr(
-                where).andEqualTo({idName: tableId})
-            res = orm.selectByExample(example)
-        else:
-            res = orm.selectByPrimaeyKey(tableId)
-
-        if res:
-            return ResponseEntity.ok(res)
-        else:
-            return ResponseEntity.notFound('没有需要的数据')
+        return ResponseEntity.ok(orm.selectByPrimaeyKey(tableId))
     elif page:  # 分页查询
         res = None
         if where:
@@ -111,9 +100,6 @@ def _get(params):
             res = orm.selectPageByExample(example, page, pageNum)
         else:
             res = orm.selectPageAll(page, pageNum)
-
-        if not res:
-            return ResponseEntity.notFound('没有需要的数据')
 
         n, d = res
         return ResponseEntity.ok(d).setNum(n)
@@ -127,10 +113,7 @@ def _get(params):
         else:
             res = orm.selectAll()
 
-        if res:
-            return ResponseEntity.ok(res)
-        else:
-            return ResponseEntity.notFound('没有需要的数据')
+        return ResponseEntity.ok(res)
 
 @post()
 def _post(params):

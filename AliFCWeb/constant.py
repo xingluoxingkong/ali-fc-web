@@ -3,8 +3,8 @@ from .fcutils import getConfig, getConfigFromConfCenter
 
 __all__ = ['CONF_CENTER_NAME', 'SQL_CONF_FILE_NAME',
            'REDIS_CONF_FILE_NAME', 'RSA_PUBLIC_KEY_FILE_NAME',
-           'RSA_PRIVATE_KEY_FILE_NAME', 'CODE2SESSION_HOST',
-           'FC_ENVIRON', 'FC_START_RESPONSE', 'getConfByName',
+           'RSA_PRIVATE_KEY_FILE_NAME', 'FC_ENVIRON', 
+           'FC_START_RESPONSE', 'getConfByName',
            'init']
 
 # 配置中心参数名
