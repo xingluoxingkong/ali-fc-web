@@ -36,7 +36,7 @@ def getConfByName(confName):
     elif CONF_CENTER_NAME in _dict:
         confCenter = _dict[CONF_CENTER_NAME]
         res = getConfigFromConfCenter(
-            confCenter['url'], confName, confCenter['pwd'])
+            confCenter['url'], confName, confCenter.get('pwd', None))
         if res.status_code != 200:
             raise Exception('从配置中心获取密钥失败！')
         data = res.text

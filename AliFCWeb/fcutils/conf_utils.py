@@ -37,16 +37,19 @@ def getConfig(names, configFileName = 'application'):
         return confData
     
 
-def getConfigFromConfCenter(url, configNames, pwd):
+def getConfigFromConfCenter(url, configNames, pwd = None):
     ''' 从网络配置中心获取配置
     --
         @param url: 配置中心地址
         @param configNames: 配置名列表，字典格式
         @param pwd: 密码
     '''
-    data = {
-        'pwd': pwd,
-        'config_names': configNames
-    }
-    res = getDataForStr(url, json.dumps(data))
+    data = configNames
+    if pwd:
+        data = {
+            'pwd': pwd,
+            'config_names': configNames
+        }
+        data = json.dumps(data)
+    res = getDataForStr(url, data)
     return res

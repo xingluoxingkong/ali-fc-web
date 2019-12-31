@@ -25,10 +25,11 @@ def configCenter(fileName='application'):
             
             # 验证密码
             pwd = getattr(configFile, 'pwd', None)
-            if not pwd and pwd != request_body['pwd']:
-                status = '401'
-                start_response(status, response_headers)
-                return [json.dumps({"message": "fail","data": "密码错误"}).encode()]
+            if pwd:
+                if pwd != request_body['pwd']:
+                    status = '401'
+                    start_response(status, response_headers)
+                    return [json.dumps({"message": "fail","data": "密码错误"}).encode()]
             
             try:
                 confData = {}

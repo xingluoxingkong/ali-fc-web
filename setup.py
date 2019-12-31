@@ -19,9 +19,9 @@ setup(
     long_description = "简易的阿里云函数计算web框架",
     license = "MIT Licence",
 
-    url = "https://github.com/l616769490/ali-fc-web",
-    author = "lijin",
-    author_email = "lijin@dingtalk.com",
+    url = "https://github.com/xingluoxingkong/ali-fc-web.git",
+    author = "星泪",
+    author_email = "xlxk@xlxk.top",
 
     packages = find_packages(),	
     include_package_data = True,
