@@ -127,7 +127,7 @@ class ResponseEntity:
                 xml = dict2xml.Dict2XML()
                 data = xml.parse(self.res)
         else:
-            raise Exception('ResponseEntity类只能编译list,dict,str类型的返回值。如需自定义返回值，请继承ResponseEntity并重写build方法')
+            data = str(self.res)
 
         if self.statusCode == '200':
             response['message'] = 'success'
