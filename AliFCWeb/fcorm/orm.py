@@ -705,7 +705,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr
             }
             
-            sql = '''SELECT COUNT(`{propertiesStr}`) num FROM {tableName} {joinStr} 
+            sql = '''SELECT COUNT({propertiesStr}) num FROM {tableName} {joinStr} 
                     {groupByStr} {orderByStr}
                     '''.format(**strDict)
             _log.info('执行sql语句：{}'.format(sql))
