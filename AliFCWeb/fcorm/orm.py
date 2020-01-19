@@ -1,6 +1,6 @@
 import logging
 from .constant import AUTO_INCREMENT_KEYS, PRIMARY_KEY
-from fcweb.fcutils import fieldStrAndPer, fieldSplit, joinList, pers, dataToStr
+from AliFCWeb.fcutils import fieldStrAndPer, fieldSplit, joinList, pers, dataToStr
 
 __all__ = ['Orm']
 
