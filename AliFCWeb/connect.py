@@ -3,7 +3,7 @@ from .fcutils import getData, getConfig
 from .sign import MysqlSign, RedisSign, PostgresqlSign
 from .constant import getConfByName
 
-__all__ = ['dbConn', 'redisConn']
+__all__ = ['mysqlConn', 'redisConn', 'postgresqlConn']
 
 
 @MysqlSign

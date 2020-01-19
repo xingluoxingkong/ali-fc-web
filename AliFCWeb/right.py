@@ -8,7 +8,6 @@
 import json
 import base64
 import logging
-from .connect import dbConn
 from .fcutils import getConfig, getDataForStr, decode, timeLater, encode, xml2dict
 from .constant import getConfByName, RSA_PRIVATE_KEY_FILE_NAME, RSA_PUBLIC_KEY_FILE_NAME, getConfByName, FC_ENVIRON, FC_START_RESPONSE
 
