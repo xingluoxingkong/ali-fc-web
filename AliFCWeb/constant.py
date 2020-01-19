@@ -72,7 +72,7 @@ def init(environ, start_response):
         _log.info('用户未配置application文件，采用默认配置文件')
 
     # 取出配置中心url和密码，默认url：config/config/，默认无需密码
-    confCenter = _dict.get('CONF_CENTER_NAME', {'url': 'config/config/'})
+    confCenter = _dict.get(CONF_CENTER_NAME, {'url': 'config/config/'})
     
     # 如果不是以http开头，则从environ中拼接完整的url地址
     if not confCenter['url'].startswith('http'):
