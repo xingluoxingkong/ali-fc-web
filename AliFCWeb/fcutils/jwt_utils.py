@@ -3,7 +3,6 @@
 # 进行jwt加解密工具
 #
 ######################################
-import jwt
 import time
 
 __all__ = ['encode', 'decode', 'timeLaterForDay',
@@ -15,6 +14,7 @@ def encode(payload, priv_key):
     :param payload:有效载荷
     :param priv_key:私钥
     '''
+    import jwt
     encoded = jwt.encode(payload, priv_key, algorithm='RS256')
     return str(encoded, encoding='utf-8')
 
@@ -25,6 +25,7 @@ def decode(encoded_str, pub_key):
     :param pub_key:公钥
     '''
     try:
+        import jwt
         info = jwt.decode(encoded_str, pub_key, algorithm='RS256')
         return info
     except Exception as e:

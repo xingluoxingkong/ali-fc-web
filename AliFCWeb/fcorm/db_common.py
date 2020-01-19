@@ -2,23 +2,29 @@ import json
 import logging
 import functools
 
-from AliFCWeb.connect import dbConn
+
 from AliFCWeb.fcorm import Orm, Example
 from AliFCWeb.response import ResponseEntity
 from AliFCWeb.fcweb import fcIndex, get, post, put, delete
 
     
 _log = logging.getLogger()
-_conn = dbConn
+_conn = None
 _PWD = None
 _PRIVATE_TABLE = []
 
 __all__ = ['dbCommon']
 
-def dbCommon(pwd = '123456', privateTables = []):
-    global _PWD, _PRIVATE_TABLE
+def dbCommon(pwd = '123456', privateTables = [], dbType = 'mysql'):
+    global _PWD, _PRIVATE_TABLE, _conn
     _PWD = pwd
     _PRIVATE_TABLE = privateTables
+    if dbType == 'mysql':
+        from AliFCWeb.connect import mysqlConn
+        _conn = mysqlConn
+    elif dbType == 'postgresql':
+        from AliFCWeb.connect import postgresqlConn
+        _conn = postgresqlConn
     def decorator(func):
         def wrapper(*args, **kw):
             environ = args[0]
