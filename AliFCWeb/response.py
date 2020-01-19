@@ -22,6 +22,7 @@ class ResponseEntity:
         self.token = token
         self.num = -1
         self.resType = resType
+        self._kw = None
 
     @staticmethod
     def status(statusCode):
@@ -80,7 +81,7 @@ class ResponseEntity:
         return self
     
     def body(self, res):
-        ''' 自定义HTTP内容
+        ''' 自定义Data内容
         --
         '''
         self.res = res
@@ -100,8 +101,15 @@ class ResponseEntity:
         self.token = token
         return self
     
+    def setKW(self, **kw):
+        ''' 自定义返回值，此处定义的参数与data同级
+        --
+        '''
+        self._kw = kw
+        return kw
+    
     def setNum(self, num):
-        ''' 自定义num
+        ''' 自定义num，data数据为list时有效
         --
         '''
         self.num = num
@@ -116,6 +124,10 @@ class ResponseEntity:
         
         response = {}
         data = {}
+        
+        if self._kw:
+            response.update(self._kw)
+            
         if isinstance(self.res, list):
             data = {'sum':len(self.res) if self.num == -1 else self.num, 'list':self.res}
         elif isinstance(self.res, str):
@@ -130,14 +142,11 @@ class ResponseEntity:
             data = str(self.res)
 
         if self.statusCode == '200':
-            response['message'] = 'success'
             # 优先使用自定义Token
             if self.token:
                 response['token'] = encodeToken(self.token)
             elif token:
                 response['token'] = encodeToken(token)
-        else:
-            response['message'] = 'fail'
         
         response['data'] = data
 

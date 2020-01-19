@@ -9,32 +9,21 @@ from .http_utils import getDataForStr
 
 __all__ = ['getConfig', 'getConfigFromConfCenter']
 
-def getConfig(names, configFileName = 'application'):
+def getConfig(configName):
     ''' 读取本地配置文件
     --
-        @param names: 配置名,列表格式/元组格式/字符串格式
-        @param configFileName: 配置文件名字，默认使用同目录下的application.py文件
+    '''       
 
-        @return: names为列表或者元组返回{配置名:配置值...}; names为字符串直接返回该配置
-    '''
-    if '.' in configFileName:
-            configFileName = configFileName.split('.')[0]
-
-    configFile = importlib.import_module(configFileName)
-
-    if isinstance(names, list) or isinstance(names, tuple):
-        confDatas = {}
-        for name in names:
-            confData = getattr(configFile, name, None)
-            if isinstance(confData, bytes):
-                confData = str(confData, encoding='utf-8')
-            confDatas[name] = confData
-        return confDatas
-    else:
-        confData = getattr(configFile, names, None)
-        if isinstance(confData, bytes):
-            return str(confData, encoding='utf-8')
-        return confData
+    module = importlib.import_module(configName)
+    
+    conf = {}
+    for attr in dir(module):
+        if attr.startswith('__'):
+            continue
+        
+        conf[attr] = getattr(module, attr)
+    
+    return conf
     
 
 def getConfigFromConfCenter(url, configNames, pwd = None):

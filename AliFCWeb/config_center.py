@@ -46,7 +46,7 @@ def configCenter(fileName='application'):
                 if isinstance(confData, dict):
                     return [json.dumps(confData).encode()]
 
-                return [confData.encode()]
+                return [str(confData).encode()]
             except Exception as e:
                 status = '404'
                 start_response(status, response_headers)
