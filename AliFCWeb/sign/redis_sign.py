@@ -1,3 +1,5 @@
+from .sign import Sign
+
 class RedisSign(Sign):
     def __init__(self, func, *args, **kw):
         ''' 获取配置中心数据。
