@@ -1,4 +1,6 @@
+import json
 from .sign import Sign
+
 class PostgresqlSign(Sign):
     def __init__(self, func, *args, **kw):
         ''' 获取配置中心数据。

@@ -1,3 +1,4 @@
+import json
 from .sign import Sign
 
 class RedisSign(Sign):
