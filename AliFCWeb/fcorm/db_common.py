@@ -2,8 +2,6 @@ import json
 import logging
 import functools
 
-import pymysql
-
 from AliFCWeb.connect import dbConn
 from AliFCWeb.fcorm import Orm, Example
 from AliFCWeb.response import ResponseEntity

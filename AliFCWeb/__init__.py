@@ -3,7 +3,7 @@ __version__ = '0.7.0'
 from .config_center import configCenter
 
 from .connect import (
-    dbConn, redisConn
+    mysqlConn, redisConn, postgresqlConn
 )
 
 from .constant import (

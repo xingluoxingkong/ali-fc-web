@@ -1,5 +1,4 @@
 import json
-import pymysql
 from .fcutils import getData, getConfig
 from .sign import MysqlSign, RedisSign, PostgresqlSign
 from .constant import getConfByName
