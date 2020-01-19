@@ -10,7 +10,7 @@ from .constant import (
     getConfByName
 )
 
-from .AliFCWeb import (
+from .fcweb import (
     fcIndex, get, post, put, delete
 )
 
