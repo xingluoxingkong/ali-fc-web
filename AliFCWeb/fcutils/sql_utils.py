@@ -120,6 +120,9 @@ def dataToJson(data):
 
         @return list, dict 或 str类型
     """
+    from collections import OrderedDict
+    if isinstance(data, OrderedDict):
+        data = dict(data)
     from decimal import Decimal
     if data == None or isinstance(data, int) or isinstance(data, float) or isinstance(data, bool):
         return data

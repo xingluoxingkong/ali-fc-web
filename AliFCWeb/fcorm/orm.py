@@ -6,6 +6,9 @@ __all__ = ['Orm']
 
 _log = logging.getLogger()
 
+_POSTGRE = 'psycopg2'
+_MYSQL = 'mysql'
+
 class Orm(object):
     def __init__(self, conn, tableName, keyProperty = PRIMARY_KEY, auto_commit = True):
         ''' 操作数据库，默认自动提交；如设置为手动提交请自己使用conn.commit()提交
@@ -15,6 +18,12 @@ class Orm(object):
             @param keyProperty: 主键字段名。可以不填，不填默认主键名为id
             @param auto_commit: 自动提交
         '''
+        if 'psycopg2' in str(type(conn)):
+            self.dbType = _POSTGRE
+        elif 'mysql' in str(type(conn)):
+            self.dbType = _MYSQL
+        else:
+            raise Exception('数据库类型暂不支持！')
         # 数据库连接
         self.conn = conn
         # 表名
@@ -631,7 +640,7 @@ class Orm(object):
                 'joinStr': self.joinStr,
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr,
-                'limitStr':'LIMIT {}, {}'.format(startId, pageNum)
+                'limitStr': self._limit(startId, pageNum)
             }
             sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                     {groupByStr} {orderByStr} {limitStr}
@@ -687,8 +696,7 @@ class Orm(object):
                 'whereStr': whereStr,
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr,
-                
-                'limitStr':'LIMIT {}, {}'.format(startId, pageNum)
+                'limitStr': self._limit(startId, pageNum)
             }
             sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                     WHERE {whereStr} {groupByStr} {orderByStr} {limitStr}
@@ -861,15 +869,20 @@ class Orm(object):
         self.conn.close()
         
         
-    ###################################解决postgresql的着重号问题#####################################
+    ###################################解决postgresql的兼容性问题#####################################
     def _encodeSql(self, sql):
         ''' 编码sql语句
         --
         '''
-        if 'psycopg2' in str(type(self.conn)):
+        if self.dbType == _POSTGRE:
             new_sql = sql.replace('`', '"')
             # 如果是自增id，添加返回值
             if 'INSERT' in sql.upper() and self.keyProperty == PRIMARY_KEY:
-                new_sql += ' RETURNING id'
+                new_sql += ' RETURNING {}'.format(self.keyProperty)
             return new_sql
         return sql
+    
+    def _limit(self, startId, pageNum):
+        if self.dbType == _POSTGRE:
+            return 'LIMIT {} offset {}'.format(pageNum, startId)
+        return 'LIMIT {}, {}'.format(startId, pageNum)

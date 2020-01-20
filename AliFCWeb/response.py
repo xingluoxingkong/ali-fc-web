@@ -130,6 +130,8 @@ class ResponseEntity:
             
         if isinstance(self.res, list):
             data = {'sum':len(self.res) if self.num == -1 else self.num, 'list':self.res}
+        elif isinstance(self.res, tuple):
+            data = {'sum':len(self.res) if self.num == -1 else self.num, 'list':list(self.res)}
         elif isinstance(self.res, str):
             data = self.res
         elif isinstance(self.res, dict) :

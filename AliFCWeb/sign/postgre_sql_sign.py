@@ -1,5 +1,7 @@
+
 import json
 from .sign import Sign
+
 
 class PostgresqlSign(Sign):
     def __init__(self, func, *args, **kw):
@@ -9,17 +11,20 @@ class PostgresqlSign(Sign):
             sql配置文件名为：sql_name，默认值为'postgresql'
         '''
         super().__init__(func, *args, **kw)
-    
+
     def replace(self):
         from AliFCWeb.constant import getConfByName, FC_ENVIRON, CONF_CENTER_NAME, POSTGRE_SQL_CONF_FILE_NAME
         confCenter = getConfByName(CONF_CENTER_NAME)
 
         from AliFCWeb.fcutils import getConfigFromConfCenter
-        res = getConfigFromConfCenter(confCenter['url'], POSTGRE_SQL_CONF_FILE_NAME, confCenter['pwd'] )
+        res = getConfigFromConfCenter(
+            confCenter['url'], POSTGRE_SQL_CONF_FILE_NAME, confCenter['pwd'])
         if res.status_code != 200:
             raise Exception('读取配置中心失败！')
         data = json.loads(res.text)
-        
+
         import psycopg2
-        conn = psycopg2.connect(**data)
+        from psycopg2.extras import RealDictCursor
+        conn = psycopg2.connect(dbname=data['dbname'], user=data['user'],
+                                password=data['password'], host=data['host'], port=data.get('port', 5432), cursor_factory=RealDictCursor)
         return conn
