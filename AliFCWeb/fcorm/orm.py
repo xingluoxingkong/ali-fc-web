@@ -450,6 +450,7 @@ class Orm(object):
         --
             @param primaryValue: 主键值
         '''
+        import psycopg2
         cursor = self.conn.cursor()
 
         try:
@@ -466,7 +467,7 @@ class Orm(object):
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
             _log.info('执行sql语句：{}；值：{}'.format(sql, primaryValue))
-            cursor.execute(self._encodeSql(sql), primaryValue)
+            cursor.execute(self._encodeSql(sql), [primaryValue])
             res = cursor.fetchone()
             if self.auto_commit:
                 self.conn.commit()
@@ -717,7 +718,7 @@ class Orm(object):
         try:
             sql = 'DELETE FROM `{}` WHERE `{}`=%s'.format(self.tableName, self.keyProperty)
             _log.info('执行sql语句：{}；值：{}'.format(sql, primaryValue))
-            res = cursor.execute(self._encodeSql(sql), primaryValue)
+            res = cursor.execute(self._encodeSql(sql), [primaryValue])
             if self.auto_commit:
                 self.conn.commit()
             return res
