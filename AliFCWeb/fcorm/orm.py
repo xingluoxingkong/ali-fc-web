@@ -116,7 +116,7 @@ class Orm(object):
             if lastId <= 0 and self.keyProperty == PRIMARY_KEY:
                 idRow = cursor.fetchone()
                 if idRow:
-                    lastId = idRow[0][0]
+                    lastId = idRow[self.keyProperty]
             if self.auto_commit:
                 self.conn.commit()
             return lastId
@@ -190,7 +190,7 @@ class Orm(object):
             if lastId <= 0 and self.keyProperty == PRIMARY_KEY:
                 idRow = cursor.fetchone()
                 if idRow:
-                    lastId = idRow[0][0]
+                    lastId = idRow[self.keyProperty]
             if self.auto_commit:
                 self.conn.commit()
             return lastId
@@ -233,7 +233,7 @@ class Orm(object):
             if lastId <= 0 and self.keyProperty == PRIMARY_KEY:
                 idRow = cursor.fetchone()
                 if idRow:
-                    lastId = idRow[0][0]
+                    lastId = idRow[self.keyProperty]
             if self.auto_commit:
                 self.conn.commit()
             return lastId
