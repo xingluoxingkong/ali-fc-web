@@ -116,7 +116,7 @@ class Orm(object):
             if lastId <= 0 and self.keyProperty == PRIMARY_KEY:
                 idRow = cursor.fetchone()
                 if idRow:
-                    lastId = idRow[0]
+                    lastId = idRow[0][0]
             if self.auto_commit:
                 self.conn.commit()
             return lastId
@@ -186,6 +186,11 @@ class Orm(object):
             else:
                 cursor.execute(self._encodeSql(sql), dataList)
             lastId = cursor.lastrowid
+            # 获取postgre的自增id
+            if lastId <= 0 and self.keyProperty == PRIMARY_KEY:
+                idRow = cursor.fetchone()
+                if idRow:
+                    lastId = idRow[0][0]
             if self.auto_commit:
                 self.conn.commit()
             return lastId
@@ -224,6 +229,11 @@ class Orm(object):
             _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.executemany(self._encodeSql(sql), values)
             lastId = cursor.lastrowid
+            # 获取postgre的自增id
+            if lastId <= 0 and self.keyProperty == PRIMARY_KEY:
+                idRow = cursor.fetchone()
+                if idRow:
+                    lastId = idRow[0][0]
             if self.auto_commit:
                 self.conn.commit()
             return lastId
