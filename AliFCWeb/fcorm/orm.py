@@ -662,12 +662,11 @@ class Orm(object):
                 'propertiesStr': '`{}`.`{}`'.format(self.tableName, self.keyProperty),
                 'tableName': self.tableName,
                 'joinStr': self.joinStr,
-                'groupByStr': self.groupByStr,
-                'orderByStr': self.orderByStr
+                # 'groupByStr': self.groupByStr,
+                # 'orderByStr': self.orderByStr
             }
 
             sql = '''SELECT COUNT({propertiesStr}) num FROM `{tableName}` {joinStr} 
-                    {groupByStr} {orderByStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}'.format(sql))
@@ -719,12 +718,12 @@ class Orm(object):
                 'tableName': self.tableName,
                 'joinStr': self.joinStr,
                 'whereStr': whereStr,
-                'groupByStr': self.groupByStr,
-                'orderByStr': self.orderByStr
+                # 'groupByStr': self.groupByStr,
+                # 'orderByStr': self.orderByStr
             }
 
             sql = '''SELECT COUNT({propertiesStr}) num FROM `{tableName}` {joinStr} 
-                    WHERE {whereStr} {groupByStr} {orderByStr}
+                    WHERE {whereStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, values))
