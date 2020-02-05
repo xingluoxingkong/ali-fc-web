@@ -6,9 +6,7 @@ from .connect import (
     mysqlConn, redisConn, postgresqlConn
 )
 
-from .constant import (
-    getConfByName
-)
+from .constant import *
 
 from .fcweb import (
     fcIndex, get, post, put, delete
