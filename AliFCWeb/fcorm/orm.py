@@ -455,7 +455,7 @@ class Orm(object):
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} {groupByStr} {orderByStr}'''.format(**strDict)
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} {groupByStr} {orderByStr}'''.format(**strDict)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}'.format(sql))
             cursor.execute(sql)
@@ -488,7 +488,7 @@ class Orm(object):
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -522,7 +522,7 @@ class Orm(object):
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -563,7 +563,7 @@ class Orm(object):
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} , {countStr} FROM {tableName} {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} , {countStr} FROM `{tableName}` {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -642,7 +642,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr
             }
             
-            sql = '''SELECT COUNT({propertiesStr}) num FROM {tableName} {joinStr} 
+            sql = '''SELECT COUNT({propertiesStr}) num FROM `{tableName}` {joinStr} 
                     {groupByStr} {orderByStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -663,7 +663,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr,
                 'limitStr': self._limit(startId, pageNum)
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
                     {groupByStr} {orderByStr} {limitStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -699,7 +699,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr
             }
             
-            sql = '''SELECT COUNT({propertiesStr}) num FROM {tableName} {joinStr} 
+            sql = '''SELECT COUNT({propertiesStr}) num FROM `{tableName}` {joinStr} 
                     WHERE {whereStr} {groupByStr} {orderByStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -721,7 +721,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr,
                 'limitStr': self._limit(startId, pageNum)
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
                     WHERE {whereStr} {groupByStr} {orderByStr} {limitStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
