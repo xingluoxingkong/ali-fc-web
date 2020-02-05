@@ -109,6 +109,8 @@ class Orm(object):
             
             keys, ps, values = fieldSplit(data)
             sql = 'INSERT INTO `{}`({}) VALUES({})'.format(self.tableName, keys, ps)
+            if self.dbType == _POSTGRE and self.keyProperty == PRIMARY_KEY:
+                sql += ' RETURNING {}'.format(self.keyProperty)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             cursor.execute(sql, values)
@@ -904,8 +906,8 @@ class Orm(object):
         if self.dbType == _POSTGRE:
             new_sql = sql.replace('`', '"')
             # 如果是自增id，添加返回值
-            if 'INSERT' in sql.upper() and self.keyProperty == PRIMARY_KEY:
-                new_sql += ' RETURNING {}'.format(self.keyProperty)
+            # if 'INSERT' in sql.upper() and self.keyProperty == PRIMARY_KEY:
+            #     new_sql += ' RETURNING {}'.format(self.keyProperty)
             return new_sql
         return sql
     
