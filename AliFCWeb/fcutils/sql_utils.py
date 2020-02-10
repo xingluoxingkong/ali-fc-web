@@ -134,9 +134,10 @@ def dataToJson(data):
                 return data
         return data
     elif isinstance(data, list) or isinstance(data, tuple):
+        newList = []
         for item in data:
-            item = dataToJson(item)
-        return data
+            newList.append(dataToJson(item))
+        return newList
     elif isinstance(data, dict):
         for k, v in data.items():
             data[k] = dataToJson(v)
