@@ -12,7 +12,7 @@ from .jwt_utils import (
     encode, decode, timeLaterForDay, timeLaterForHour, timeLater
 )
 from .oss_utils import (
-    ShanghaiOSS, HangzhouOSS, QingdaoOSS, BeijingOSS, ZhangjiakouOSS, HuhehaoteOSS, ShenzhenOSS, ChengduOSS, HongkongOSS
+    OSSUtils, ShanghaiOSS, HangzhouOSS, QingdaoOSS, BeijingOSS, ZhangjiakouOSS, HuhehaoteOSS, ShenzhenOSS, ChengduOSS, HongkongOSS, XinJiaPoOSS
 )
 from .pwd_utils import (
     createPwd, createSalt

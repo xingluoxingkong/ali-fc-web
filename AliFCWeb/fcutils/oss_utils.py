@@ -4,7 +4,7 @@ __all__ = ['OSSUtils', 'ShanghaiOSS',
            'HangzhouOSS', 'QingdaoOSS',
            'BeijingOSS', 'ZhangjiakouOSS',
            'HuhehaoteOSS', 'ShenzhenOSS',
-           'ChengduOSS', 'HongkongOSS']
+           'ChengduOSS', 'HongkongOSS', 'XinJiaPoOSS']
 
 _SHANGHAI = 'https://oss-cn-shanghai.aliyuncs.com'
 _HANGZHOU = 'https://oss-cn-hangzhou.aliyuncs.com'
@@ -15,6 +15,7 @@ _HUHEHAOTE = 'https://oss-cn-huhehaote.aliyuncs.com'
 _SHENZHEN = 'https://oss-cn-shenzhen.aliyuncs.com'
 _CHENGDU = 'https://oss-cn-chengdu.aliyuncs.com'
 _HONGKONG = 'https://oss-cn-hongkong.aliyuncs.com'
+_XINJIAPO = 'https://oss-ap-southeast-1.aliyuncs.com'
 
 class OSSUtils(object):
     """ 封装OSS中的常用操作
@@ -87,3 +88,6 @@ class ChengduOSS(OSSUtils):
 class HongkongOSS(OSSUtils):
     def __init__(self, accessKeyId, accessKeySecret, bucketName):
         super(HongkongOSS, self).__init__(accessKeyId, accessKeySecret, bucketName, _HONGKONG)
+class XinJiaPoOSS(OSSUtils):
+    def __init__(self, accessKeyId, accessKeySecret, bucketName):
+        super(XinJiaPoOSS, self).__init__(accessKeyId, accessKeySecret, bucketName, _XINJIAPO)
