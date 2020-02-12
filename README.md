@@ -26,29 +26,223 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
     report: true
     ```
 ### 编写HelloWorld
-import logging
-from AliFCWeb import fcIndex, get, post, put, delete, ResponseEntity
-import json
+- 本地创建test目录，用于存放所有的demo
+- 在test目录下创建demo01
+- 在demo01目录下创建template.yml，内容如下：
+    ```yaml
+    ROSTemplateFormatVersion: '2015-09-01'
+    Transform: 'Aliyun::Serverless-2018-04-03'
+    Resources:
+      fcweb-demo:
+        Type: 'Aliyun::Serverless::Service'
+        Properties:
+          Description: '函数计算fcweb框架demo'
+        demo01:
+          Type: 'Aliyun::Serverless::Function'
+          Properties:
+            Description: 'HelloWorld'
+            Handler: index.handler
+            Runtime: python3
+            CodeUri: '.'
+            Timeout: 30
+          Events:
+            httpTrigger:
+              Type: HTTP
+              Properties:
+                AuthType: ANONYMOUS
+                Methods: 
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+    ```
+- 在demo01目录下创建index.py，代码如下:
+	```python
+    import json
+    import logging
+    from AliFCWeb import fcIndex, get, post, put, delete, ResponseEntity
 
-def authTest(environ):
-    return False
+    @fcIndex()
+    def handler(environ, start_response):
+        pass
 
-@fcIndex(auth = authTest)
-def handler(environ, start_response):
-   pass
-
-@get('/demo/text-application/{id}')
-def testGet(id):
-    return ResponseEntity.ok('收到GET请求，请求内容%d' % id)
-
-@post()
-def testPost(user):
-    return ResponseEntity.ok('收到POST请求,请求内容%s' % user)
-
-@put()
-def testPut(user):
-    return ResponseEntity.ok('收到PUT请求,请求内容%s' % user)
-
-@delete()
-def testDelete(user):
-    return ResponseEntity.ok('收到DELETE请求,请求内容%s' % user)
+    @get()
+    def confirmSeller(data):
+        return ResponseEntity.ok('Hello World!')
+	```
+- 引包，控制台执行命令
+	```shell
+	fun install --save --runtime python3 --package-type pip AliFCWeb
+	```
+	引包后结构如下：
+	![目录结构](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo01/01.png)
+- 上传，控制台执行命令
+	```shell
+	fun deploy
+	```
+- 进入函数计算控制台，点击执行查看运行结果
+	![Hello World执行结果](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo01/02.png)
+## 三、获取参数
+### 1. 获取地址栏参数
+- 复制demo01，重命名为demo02
+- 修改template.yml
+	```yaml
+	ROSTemplateFormatVersion: '2015-09-01'
+    Transform: 'Aliyun::Serverless-2018-04-03'
+    Resources:
+      fcweb-demo:
+        Type: 'Aliyun::Serverless::Service'
+        Properties:
+          Description: '函数计算fcweb框架demo'
+        demo02:
+          Type: 'Aliyun::Serverless::Function'
+          Properties:
+            Description: '获取地址栏参数'
+            Handler: index.handler
+            Runtime: python3
+            CodeUri: '.'
+            Timeout: 30
+          Events:
+            httpTrigger:
+              Type: HTTP
+              Properties:
+                AuthType: ANONYMOUS
+                Methods: 
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+	```
+- 修改index.py
+	```python
+    import json
+    import logging
+    
+    from AliFCWeb import fcIndex, get, post, put, delete, ResponseEntity
+    
+    @fcIndex(debug=True)
+    def handler(environ, start_response):
+        pass
+        
+    @get()
+    def confirmSeller(data):
+        print('前端传来的参数：')
+        print(data)
+        return ResponseEntity.ok(data)
+  ```
+- 上传代码
+	```shell
+	fun deploy
+	```
+- 测试，在控制台随便传递几个参数
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo02/01.png)
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo02/02.png)
+### 2. 获取body参数
+- 复制demo02，重命名为demo03
+- 修改template.yml文件
+    ```yaml
+    ROSTemplateFormatVersion: '2015-09-01'
+    Transform: 'Aliyun::Serverless-2018-04-03'
+    Resources:
+      fcweb-demo:
+        Type: 'Aliyun::Serverless::Service'
+        Properties:
+          Description: '函数计算fcweb框架demo'
+        demo03:
+          Type: 'Aliyun::Serverless::Function'
+          Properties:
+            Description: '获取body参数'
+            Handler: index.handler
+            Runtime: python3
+            CodeUri: '.'
+            Timeout: 30
+          Events:
+            httpTrigger:
+              Type: HTTP
+              Properties:
+                AuthType: ANONYMOUS
+                Methods: 
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+    ```
+- 修改index.py文件
+    ```python
+    import json
+    import logging
+    
+    from AliFCWeb import fcIndex, get, post, put, delete, ResponseEntity
+    
+    @fcIndex(debug=True)
+    def handler(environ, start_response):
+        pass
+    
+    # 改为post请求
+    @post()
+    def confirmSeller(data):
+        print('前端传来的参数：')
+        print(data)
+        return ResponseEntity.ok(data)
+    ```
+- 上传代码
+	```shell
+	fun deploy
+	```
+- 测试执行
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo03/01.png)
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo03/02.png)
+### 3. 获取摸板参数
+- 复制demo03，重命名为demo04
+- 修改template.yml文件
+    ```yaml
+    ROSTemplateFormatVersion: '2015-09-01'
+    Transform: 'Aliyun::Serverless-2018-04-03'
+    Resources:
+      fcweb-demo:
+        Type: 'Aliyun::Serverless::Service'
+        Properties:
+          Description: '函数计算fcweb框架demo'
+        demo04:
+          Type: 'Aliyun::Serverless::Function'
+          Properties:
+            Description: '获取摸板参数'
+            Handler: index.handler
+            Runtime: python3
+            CodeUri: '.'
+            Timeout: 30
+          Events:
+            httpTrigger:
+              Type: HTTP
+              Properties:
+                AuthType: ANONYMOUS
+                Methods: 
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+    ```
+- 修改index.py文件
+    ```python
+    import json
+    import logging
+    
+    from AliFCWeb import fcIndex, get, post, put, delete, ResponseEntity
+    
+    @fcIndex(debug=True)
+    def handler(environ, start_response):
+        pass
+    
+    @get('/demo04/{name}')
+    def confirmSeller(data):
+        print('前端传来的参数：')
+        print(data)
+        return ResponseEntity.ok(data)
+    ```
+- 上传代码
+	```shell
+	fun deploy
+	```
+- 测试执行
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo04/01.png)
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo04/02.png)

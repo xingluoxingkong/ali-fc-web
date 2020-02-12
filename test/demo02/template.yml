@@ -1,0 +1,25 @@
+ROSTemplateFormatVersion: '2015-09-01'
+Transform: 'Aliyun::Serverless-2018-04-03'
+Resources:
+  fcweb-demo:
+    Type: 'Aliyun::Serverless::Service'
+    Properties:
+      Description: '函数计算fcweb框架demo'
+    demo02:
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Description: '获取地址栏参数'
+        Handler: index.handler
+        Runtime: python3
+        CodeUri: '.'
+        Timeout: 30
+      Events:
+        httpTrigger:
+          Type: HTTP
+          Properties:
+            AuthType: ANONYMOUS
+            Methods: 
+              - GET
+              - POST
+              - PUT
+              - DELETE
