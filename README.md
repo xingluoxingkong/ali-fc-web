@@ -74,7 +74,6 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 	```shell
 	fun install --save --runtime python3 --package-type pip AliFCWeb
 	```
-	引包后结构如下：
 	![目录结构](./img//demo01/01.png)
 - 上传，控制台执行命令
 	```shell
