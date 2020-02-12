@@ -5,23 +5,22 @@ from .constant import getConfByName, FC_START_RESPONSE
 
 __all__ = ['ResponseEntity']
 
+
 class ResponseEntity:
 
-    def __init__(self, statusCode, res = None, token = None, resType = 'json', response_headers= [('Content-type', 'application/json')]):
+    def __init__(self, statusCode, res=None, token=None):
         ''' 返回数据封装
         --
             @param statusCode: http代码
             @param res: 返回的数据【dict, list, str】
             @param token: token
-            @param resType: 返回数据的编码类型【json, xml】
-            @param response_headers: 设置返回头
         '''
         self.statusCode = statusCode
         self.res = res
-        self.response_headers = response_headers
+        self.response_headers = [('Content-type', 'application/json')]
         self.token = token
         self.num = -1
-        self.resType = resType
+        self.resType = 'json'
         self._kw = None
 
     @staticmethod
@@ -37,7 +36,7 @@ class ResponseEntity:
         --
         '''
         return ResponseEntity('200', res)
-    
+
     @staticmethod
     def responseXml(res):
         ''' 返回xml
@@ -65,33 +64,60 @@ class ResponseEntity:
         --
         '''
         return ResponseEntity('404', res)
-    
+
     @staticmethod
     def serverError(res):
         ''' 500, 服务器错误
         --
         '''
         return ResponseEntity('500', res)
-    
-    def header(self, response_headers = [('Content-type', 'application/json')]):
+
+    def setResType(self, resType):
+        ''' 设置返回值类型
+        --
+        '''
+        if resType == 'json':
+            self.header([('Content-type', 'application/json')])
+        elif resType == 'xml':
+            self.header([('Content-type', 'text/xml')])
+        elif resType == 'html':
+            self.header([('Content-type', 'text/html')])
+        else:
+            return self
+
+        self.resType = resType
+        return self
+
+    def header(self, response_headers=[('Content-type', 'application/json')]):
         ''' 自定义HTTP头
         --
         '''
-        self.response_headers = response_headers
-        return self
+        if isinstance(response_headers, list):
+            return self
+        if len(response_headers) < 1:
+            return self
+        if isinstance(response_headers[0], tuple):
+            return self
+
+        for h in response_headers:
+            if h[0] == 'Content-type':
+                if 'json' in h[1]:
+                    self.resType = 'json'
+                elif 'xml' in h[1]:
+                    self.resType = 'xml'
+                elif 'html' in h[1]:
+                    self.resType = 'html'
+                else:
+                    return self
+                self.response_headers = response_headers
+                return self
+         return self
     
     def body(self, res):
         ''' 自定义Data内容
         --
         '''
         self.res = res
-        return self
-
-    def setResType(self, resType):
-        ''' 设置返回值类型
-        --
-        '''
-        self.resType = resType
         return self
 
     def setToken(self, token):
@@ -127,13 +153,16 @@ class ResponseEntity:
         
         if self._kw:
             response.update(self._kw)
-            
-        if isinstance(self.res, list):
+        
+        if isinstance(self.res, str):
+            # html直接编码返回
+            if self.resType == 'html':
+                return [self.res.encode()]
+            data = self.res
+        elif isinstance(self.res, list):
             data = {'sum':len(self.res) if self.num == -1 else self.num, 'list':self.res}
         elif isinstance(self.res, tuple):
             data = {'sum':len(self.res) if self.num == -1 else self.num, 'list':list(self.res)}
-        elif isinstance(self.res, str):
-            data = self.res
         elif isinstance(self.res, dict) :
             if self.resType == 'json':
                 data = self.res
