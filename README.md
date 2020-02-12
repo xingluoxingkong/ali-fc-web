@@ -246,3 +246,57 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 - 测试执行
 ![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo04/01.png)
 ![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo04/02.png)
+### 4. 获取混合参数
+- 复制demo04，重命名为demo05
+- 修改template.yml文件
+    ```yaml
+    ROSTemplateFormatVersion: '2015-09-01'
+    Transform: 'Aliyun::Serverless-2018-04-03'
+    Resources:
+      fcweb-demo:
+        Type: 'Aliyun::Serverless::Service'
+        Properties:
+          Description: '函数计算fcweb框架demo'
+        demo05:
+          Type: 'Aliyun::Serverless::Function'
+          Properties:
+            Description: '获取混合参数'
+            Handler: index.handler
+            Runtime: python3
+            CodeUri: '.'
+            Timeout: 30
+          Events:
+            httpTrigger:
+              Type: HTTP
+              Properties:
+                AuthType: ANONYMOUS
+                Methods: 
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+    ```
+- 修改index.py文件
+    ```python
+    import json
+    import logging
+    
+    from AliFCWeb import fcIndex, get, post, put, delete, ResponseEntity
+    
+    @fcIndex(debug=True)
+    def handler(environ, start_response):
+        pass
+    
+    @post('/demo05/{name}')
+    def confirmSeller(data):
+        print('前端传来的参数：')
+        print(data)
+        return ResponseEntity.ok(data)
+    ```
+- 上传代码
+	```shell
+	fun deploy
+	```
+- 测试执行（为了方便查看结果，此处我们使用类似postman的工具进行测试）
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo05/01.png)
+![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo05/02.png)
