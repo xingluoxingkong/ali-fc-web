@@ -196,7 +196,12 @@ def _commonHttp(pattern, func):
     environ = getConfByName(FC_ENVIRON)
     start_response = getConfByName(FC_START_RESPONSE)
     requestUri = environ['fc.request_uri']
-    fcInterfaceURL = requestUri.split('proxy')[1].replace('.LATEST', '')
+    fcInterfaceURL = requestUri
+    try:
+        fcInterfaceURL = requestUri.split('proxy')[1].replace('.LATEST', '')
+    except Exception as e:
+        pass
+    
     # 解析参数
     from .utils import pathMatch, getBody
     params = pathMatch(fcInterfaceURL, pattern)
