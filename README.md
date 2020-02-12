@@ -75,13 +75,13 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 	fun install --save --runtime python3 --package-type pip AliFCWeb
 	```
 	引包后结构如下：
-	![目录结构](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo01/01.png)
+	![目录结构](/img/demo01/01.png)
 - 上传，控制台执行命令
 	```shell
 	fun deploy
 	```
 - 进入函数计算控制台，点击执行查看运行结果
-	![Hello World执行结果](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo01/02.png)
+	![Hello World执行结果](/img/demo01/02.png)
 ## 三、获取参数
 ### 1. 获取地址栏参数
 - 复制demo01，重命名为demo02
@@ -135,8 +135,8 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 	fun deploy
 	```
 - 测试，在控制台随便传递几个参数
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo02/01.png)
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo02/02.png)
+![](/img/demo02/01.png)
+![](/img/demo02/02.png)
 ### 2. 获取body参数
 - 复制demo02，重命名为demo03
 - 修改template.yml文件
@@ -190,8 +190,8 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 	fun deploy
 	```
 - 测试执行
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo03/01.png)
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo03/02.png)
+![](/img/demo03/01.png)
+![](/img/demo03/02.png)
 ### 3. 获取摸板参数
 - 复制demo03，重命名为demo04
 - 修改template.yml文件
@@ -244,8 +244,8 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 	fun deploy
 	```
 - 测试执行
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo04/01.png)
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo04/02.png)
+![](/img/demo04/01.png)
+![](/img/demo04/02.png)
 ### 4. 获取混合参数
 - 复制demo04，重命名为demo05
 - 修改template.yml文件
@@ -298,5 +298,5 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 	fun deploy
 	```
 - 测试执行（为了方便查看结果，此处我们使用类似postman的工具进行测试）
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo05/01.png)
-![](https://fc-demo-img.oss-cn-beijing.aliyuncs.com/demo05/02.png)
+![](/img/demo05/01.png)
+![](/img/demo05/02.png)
