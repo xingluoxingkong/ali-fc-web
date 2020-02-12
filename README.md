@@ -12,7 +12,7 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 - 安装fun，安装教程参考[官方文档](https://github.com/alibaba/funcraft/blob/master/docs/usage/installation-zh.md?spm=a2c4g.11186623.2.18.30a8130772dyyb&file=installation-zh.md)
 - 配置fun环境
     - 配置方法1：在命令台键入 fun config，然后按照提示，依次配置 Account ID、Access Key Id、Secret Access Key、 Default Region Name
-    - 配置方法2：在C:\Users\当前用户\.fcli文件夹下创建config.yaml文件并输入以下内容（注意将其中的配置替换成你自己的配置）
+    - 配置方法2：在C:\Users\当前用户\\.fcli文件夹下创建config.yaml文件并输入以下内容（注意将其中的配置替换成你自己的配置）
     ```yaml
     endpoint: 'https://AccountID.RegionName.fc.aliyuncs.com'
     api_version: '2016-08-15'
