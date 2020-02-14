@@ -496,7 +496,11 @@ class Orm(object):
         --
             @param primaryValue: 主键值
         '''
-        import psycopg2
+        try:
+            import psycopg2
+        except Exception as e:
+            pass
+        
         cursor = self.conn.cursor()
 
         try:

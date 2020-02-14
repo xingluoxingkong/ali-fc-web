@@ -9,7 +9,7 @@ def handler(environ, start_response):
     pass
 
 @post('/demo05/{name}')
-def confirmSeller(data):
+def testFC(data):
     print('前端传来的参数：')
     print(data)
     return ResponseEntity.ok(data)

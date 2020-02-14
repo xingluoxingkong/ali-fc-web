@@ -10,5 +10,5 @@ def handler(environ, start_response):
 
 
 @get()
-def confirmSeller(data):
+def testFC(data):
     return ResponseEntity.ok('Hello World!')

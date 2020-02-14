@@ -1,0 +1,7 @@
+
+RUNTIME python3
+
+RUN fun-install pip install AliFCWeb
+
+
+RUN fun-install pip install pyjwt

@@ -26,7 +26,7 @@ def configCenter(fileName='application'):
             # 验证密码
             pwd = getattr(configFile, 'pwd', None)
             if pwd:
-                if pwd != request_body['pwd']:
+                if pwd != request_body.get('pwd', None):
                     status = '401'
                     start_response(status, response_headers)
                     return [json.dumps({"message": "fail","data": "密码错误"}).encode()]

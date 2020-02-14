@@ -10,7 +10,7 @@ def handler(environ, start_response):
 
 # 改为post请求
 @post()
-def confirmSeller(data):
+def testFC(data):
     print('前端传来的参数：')
     print(data)
     return ResponseEntity.ok(data)
