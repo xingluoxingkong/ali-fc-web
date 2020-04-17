@@ -1,4 +1,4 @@
-__version__ = '1.0.2'
+__version__ = '1.1.0'
 
 from .config_center import configCenter
 
@@ -19,3 +19,5 @@ from .right import (
 )
 
 from .utils import createId, getBody, getBodyAsJson, getBodyAsStr
+
+from .engine import PooledDB
