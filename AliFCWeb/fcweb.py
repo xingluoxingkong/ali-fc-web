@@ -3,6 +3,9 @@ import logging
 import functools
 import importlib
 from inspect import isfunction
+from urllib.parse import unquote
+
+from .sign import Sign
 from .response import ResponseEntity
 from .constant import getConfByName, FC_ENVIRON, FC_START_RESPONSE
 from .right import isLogin, updateToken, getTokenFromHeader
@@ -43,20 +46,64 @@ def fcIndex(debug = False):
         return wrapper
     return decorator
 
+def _findFc():
+    environ = getConfByName(FC_ENVIRON)
+    # 接口地址
+    requestUri = environ['fc.request_uri']
+
+    # 如果没有使用自定义域名
+    if requestUri.startswith("/2016-08-15/proxy"):
+        # 去掉服务名
+        fcInterfaceURL = requestUri.split('proxy/')[1]
+        fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/') + 1:]
+    else:
+        fcInterfaceURL = fcInterfaceURL[1:] if fcInterfaceURL.startswith('/') else fcInterfaceURL
+    
+    # 去掉函数名
+    fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/')+1:]
+    # 去掉参数
+    n = fcInterfaceURL.rfind('?')
+    fcInterfaceURL = fcInterfaceURL[:n]
+    
+    module_name = fcInterfaceURL.split('/')[0]
+    try:
+        # 加载模块
+        mod = importlib.import_module(module_name)
+    except Exception as e:
+        # 加载入口函数所在的文件
+        context = environ['fc.context']
+        function = getattr(context, 'function')
+        handler = getattr(function, 'handler')
+        module_name = handler.split('.')[0]
+        module_name = module_name.replace('/', '.')
+        mod = importlib.import_module(module_name)
+    
+    request_method = environ['REQUEST_METHOD'].upper() 
+
+    func = None 
+    
+    for attr in dir(mod):
+        if attr.startswith('__'):
+            continue
+        fn = getattr(mod, attr)
+        
+        if isfunction(fn):
+            method = getattr(fn, '__method__', None)
+            if request_method == method:
+                func = fn
+        if isinstance(fn, Sign):    # 替换标记
+            setattr(mod, attr, fn.replace())
+            
+    return func
+
 def _run():
     ''' 根据请求类型（GET，POST）执行对应的方法
     '''
-    environ = getConfByName(FC_ENVIRON)
-    start_response = getConfByName(FC_START_RESPONSE)
-    request_method = environ['REQUEST_METHOD']
-
     # 获取方法列表
-    funcs = _getFuncs()
+    funcs = _findFc()
     
-    if request_method in funcs:
-        # 选择方法
-        fn = funcs[request_method]
-        return fn()
+    if funcs:
+        return funcs()
     else:
         res = ResponseEntity.badRequest('请求类型不支持！') 
         return _responseFormat(res)
@@ -220,35 +267,7 @@ def _commonHttp(pattern, func):
     res = func(params)
     return res
 
-def _getFuncs():
-    ''' 获取方法列表，同时替换掉有标记的方法
-    --
-        @param environ 函数计算的environ
-        @return {'GET':get方法, 'POST':post方法, 'PUT':put方法, 'DELETE':delete方法}
-    '''
-    environ = getConfByName(FC_ENVIRON)
-    context = environ['fc.context']
-    function = getattr(context, 'function')
-    handler = getattr(function, 'handler')
-    modName = handler.split('.')[0]
-    modName = modName.replace('/', '.')
-    mod = importlib.import_module(modName)
-    # mod = __import__(modName, globals(), locals())
-    funcs = {}
-    
-    for attr in dir(mod):
-        if attr.startswith('__'):
-            continue
-        fn = getattr(mod, attr)
-        
-        if isfunction(fn):
-            method = getattr(fn, '__method__', None)
-            funcs[method] = fn
-        
-        from .sign import Sign
-        if isinstance(fn, Sign):    # 替换标记
-            setattr(mod, attr, fn.replace())
-    return funcs
+
 
 def _responseFormat(responseEntity, token = None):
     ''' 获取返回数据
