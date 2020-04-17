@@ -20,4 +20,4 @@ from .right import (
 
 from .utils import createId, getBody, getBodyAsJson, getBodyAsStr
 
-from .engine import PooledDB
+from .engine import CreatePool, PooledDB

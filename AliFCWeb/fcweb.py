@@ -91,8 +91,8 @@ def _findFc():
             method = getattr(fn, '__method__', None)
             if request_method == method:
                 func = fn
-        if isinstance(fn, Sign):    # 替换标记
-            setattr(mod, attr, fn.replace())
+        # if isinstance(fn, Sign):    # 替换标记
+        #     setattr(mod, attr, fn.replace())
             
     return func
 
