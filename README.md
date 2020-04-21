@@ -299,6 +299,10 @@ fun install --save --runtime python3 --package-type pip AliFCWeb
 - 测试执行（为了方便查看结果，此处我们使用类似postman的工具进行测试）
 ![](./img//demo05/01.png)
 ![](./img//demo05/02.png)
+### 5. 使用模块作为url路径
+1. 你可以新建一个 module_name.py 的py文件，那么你就可以通过http://你的url/module_name 跳转到该文件中执行相应代码
+2. 你也可以新建一个叫 module_name 的文件夹，在其中新建\_\_init\_\_.py文件，那么你就可以通过http://你的ur/module_name 跳转到该文件中执行相应代码
+3. PS：module_name为你取的任意名字
 
 ## 四、使用配置中心
 
@@ -788,8 +792,8 @@ KWhUrhfmSsmj0g==
 
   ```python
   mysql = {
-      'url': '',
-      'username': '',
+      'host': '',
+      'user': '',
       'password': '',
       'database': '',
       'charset': 'utf8'
@@ -1041,6 +1045,37 @@ deleteByPrimaryKey()接收一个参数
       
       return ResponseEntity.ok('请查看控制台日志')
   ```
+### 4. 使用连接池连接数据库
+```python
+  import json
+  import logging
+  
+  from AliFCWeb.fcorm import Orm, Example
+  from AliFCWeb import fcIndex, get, post, put, delete, mysqlConn, ResponseEntity
+  from AliFCWeb.engine import CreatePool
+  
+  _log = logging.getLogger()
+  _mysql = CreatePool('mysql', 
+                    maxconnections=10,  # 连接池允许的最大连接数，0和None表示不限制连接数
+                    maxcached=5,  # 链接池中最多闲置的链接，0和None不限制
+                    maxshared=3,  # 链接池中最多共享的链接数量，0和None表示全部共享
+                    blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待。
+                    maxusage=None,  # 一个链接最多被重复使用的次数，None表示无限制
+                    )
+  
+  @fcIndex(debug=True)
+  def handler(environ, start_response):
+      pass
+  
+  @post()
+  def testFC(data):
+      # 每次使用前必须获取连接，之后和正常使用方式一致
+      _conn = _mysql.conn()
+      orm = Orm(_conn, 'user')
+      userId = orm.updateByPrimaryKey({'age': 20}, 1)
+      user = orm.selectByPrimaeyKey(1)
+      return ResponseEntity.ok(user)
+```
 ## 八、自定义锚点
 
 在使用数据库时，我们用到的mysqlConn、redisConn和postgresqlConn其实就是锚点。锚点的作用是在运行时加载全局变量。**当你需要在全局变量中使用environ中的数据或者在全局变量中使用配置中心时可以派上用场。**
