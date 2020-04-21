@@ -21,6 +21,6 @@ class MysqlSign(Sign):
         data = json.loads(res.text)
         
         import pymysql
-        conn = pymysql.connect(data['url'], data['username'], data['password'], data['database'], 
+        conn = pymysql.connect(data['host'], data['user'], data['password'], data['database'], 
                                 charset = data['charset'], cursorclass=pymysql.cursors.DictCursor)
         return conn

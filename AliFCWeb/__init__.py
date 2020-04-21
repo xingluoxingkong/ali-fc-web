@@ -1,12 +1,12 @@
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 from .config_center import configCenter
+
+from .constant import *
 
 from .connect import (
     mysqlConn, redisConn, postgresqlConn
 )
-
-from .constant import *
 
 from .fcweb import (
     fcIndex, get, post, put, delete

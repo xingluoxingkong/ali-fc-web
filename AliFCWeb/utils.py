@@ -11,7 +11,7 @@ from .constant import getConfByName, FC_ENVIRON
 __all__ = ['pathMatch', 'createId', 'getBody', 'getBodyAsJson', 'getBodyAsStr']
 
 
-def pathMatch(path, pattern=None):
+def pathMatch(path, path_info, pattern=None):
     ''' 解析路径
     --
         :params path 路径，路径中形如【xxxx?key=value&key=value】的字符串会被解析成键值对
@@ -32,8 +32,11 @@ def pathMatch(path, pattern=None):
                     params[aa[0]] = _format(unquote(aa[1], 'utf-8'))
     # 获取模板中的参数
     if pattern:
+        pattern = pattern.strip('/')
+        path_info = path_info.strip('/')
+        
         paths1 = pattern.split('/')
-        paths2 = path.split('/') if n == -1 else path[:n].split('/')
+        paths2 = path_info.split('/')
         if len(paths2) == len(paths1):
             for i, a in enumerate(paths1):
                 if a.startswith('{') and a.endswith('}'):
@@ -90,6 +93,7 @@ def createId():
 
     return temp + serviceName
 
+
 def getBody():
     ''' 读取body中的数据并自动格式化
     --
@@ -107,16 +111,17 @@ def getBody():
         return json.loads(data)
     except Exception as e:
         pass
-    
+
     try:
         from .fcutils import xml2dict
         xml = xml2dict.XML2Dict()
         return xml.parse(data)
     except Exception as e:
         pass
-    
+
     return data
-    
+
+
 def getBodyAsJson():
     ''' 获取json格式的请求体
     '''

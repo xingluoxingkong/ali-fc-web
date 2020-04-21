@@ -109,8 +109,6 @@ class MysqlPool(Pool):
         import pymysql
         data['creator'] = pymysql
         data['cursorclass'] = pymysql.cursors.DictCursor
-        # data['host'] = data.pop('url')
         data['port'] = data.get('port', 3306)
-        # data['user'] = data.pop('username')
 
         self.POOL = PooledDB(**data)

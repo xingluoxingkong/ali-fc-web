@@ -48,27 +48,38 @@ def fcIndex(debug = False):
 
 def _findFc():
     environ = getConfByName(FC_ENVIRON)
-    # 接口地址
-    requestUri = environ['fc.request_uri']
+    
+    path_info = environ['PATH_INFO']
+    if path_info.startswith('/'):
+        path_info = path_info[1:]
+    
+    module_name = path_info.split('/')[0]
+    # # 接口地址
+    # requestUri = environ['fc.request_uri']
 
-    # 如果没有使用自定义域名
-    if requestUri.startswith("/2016-08-15/proxy"):
-        # 去掉服务名
-        fcInterfaceURL = requestUri.split('proxy/')[1]
-        fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/') + 1:]
-    else:
-        fcInterfaceURL = fcInterfaceURL[1:] if fcInterfaceURL.startswith('/') else fcInterfaceURL
+    # # 如果没有使用自定义域名
+    # if requestUri.startswith("/2016-08-15/proxy"):
+    #     # 去掉服务名
+    #     fcInterfaceURL = requestUri.split('proxy/')[1]
+    #     fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/') + 1:]
+    # else:
+    #     fcInterfaceURL = fcInterfaceURL[1:] if fcInterfaceURL.startswith('/') else fcInterfaceURL
     
-    # 去掉函数名
-    fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/')+1:]
-    # 去掉参数
-    n = fcInterfaceURL.rfind('?')
-    fcInterfaceURL = fcInterfaceURL[:n]
+    # # 去掉函数名
+    # fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/')+1:]
+    # # 去掉参数
+    # n = fcInterfaceURL.rfind('?')
+    # fcInterfaceURL = fcInterfaceURL[:n]
     
-    module_name = fcInterfaceURL.split('/')[0]
+    # module_name = fcInterfaceURL.split('/')[0]
     try:
         # 加载模块
         mod = importlib.import_module(module_name)
+        n = path_info.find(module_name) + len(module_name)
+        # 模块加载成功后从路径中去掉模块名
+        environ['PATH_INFO'] = path_info[n:]
+        # from .constant import setConfByName
+        # setConfByName(FC_ENVIRON, environ)
     except Exception as e:
         # 加载入口函数所在的文件
         context = environ['fc.context']
@@ -91,8 +102,8 @@ def _findFc():
             method = getattr(fn, '__method__', None)
             if request_method == method:
                 func = fn
-        # if isinstance(fn, Sign):    # 替换标记
-        #     setattr(mod, attr, fn.replace())
+        if isinstance(fn, Sign):    # 替换标记
+            setattr(mod, attr, fn.replace())
             
     return func
 
@@ -243,16 +254,17 @@ def _commonHttp(pattern, func):
     environ = getConfByName(FC_ENVIRON)
     start_response = getConfByName(FC_START_RESPONSE)
     requestUri = environ['fc.request_uri']
-    fcInterfaceURL = requestUri
-    try:
-        fcInterfaceURL = requestUri.split('proxy/')[1]
-        fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/'):]
-    except Exception as e:
-        pass
+    path_info = environ['PATH_INFO']
+    # fcInterfaceURL = requestUri
+    # try:
+    #     fcInterfaceURL = requestUri.split('proxy/')[1]
+    #     fcInterfaceURL = fcInterfaceURL[fcInterfaceURL.find('/'):]
+    # except Exception as e:
+    #     pass
     
     # 解析参数
     from .utils import pathMatch, getBody
-    params = pathMatch(fcInterfaceURL, pattern)
+    params = pathMatch(requestUri, path_info, pattern)
     body = getBody()
     
     if params == None:

@@ -21,10 +21,18 @@ class Orm(object):
         '''
         if 'psycopg2' in str(type(conn)):
             self.dbType = _POSTGRE
-        elif 'mysql' in str(type(conn)):
+        elif 'mysql' in str(type(conn)) :
             self.dbType = _MYSQL
         else:
-            raise Exception('数据库类型暂不支持！')
+            try:
+                if 'psycopg2' in conn._pool._creator.__name__:
+                    self.dbType = _POSTGRE
+                elif 'mysql' in conn._pool._creator.__name__:
+                    self.dbType = _MYSQL
+                else:
+                    raise Exception('数据库类型暂不支持！')
+            except Exception as e:
+                raise Exception('数据库类型暂不支持！')
         # 数据库连接
         self.conn = conn
         # 表名
