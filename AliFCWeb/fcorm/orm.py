@@ -36,7 +36,13 @@ class Orm(object):
         # 数据库连接
         self.conn = conn
         # 表名
-        self.tableName = tableName
+        if tableName.startswith('`') and tableName.endswith('`'):
+            self.tableName = tableName
+        elif '.' in tableName:
+            tableNameSplit = tableName.split('.')
+            self.tableName = '`' + tableNameSplit[0] + '`.`' + tableNameSplit[1] + '`'
+        else:
+            self.tableName = '`' + tableName + '`'
         # 主键名
         self.keyProperty = keyProperty
         # 主键策略
@@ -118,7 +124,7 @@ class Orm(object):
                     data[self.keyProperty] = self.generator()
 
             keys, ps, values = fieldSplit(data)
-            sql = 'INSERT INTO `{}`({}) VALUES({})'.format(
+            sql = 'INSERT INTO {}({}) VALUES({})'.format(
                 self.tableName, keys, ps)
             if self.dbType == _POSTGRE and self.keyProperty == PRIMARY_KEY:
                 sql += ' RETURNING {}'.format(self.keyProperty)
@@ -198,7 +204,7 @@ class Orm(object):
                     else:
                         dataList.append(self.generator())
 
-            sql = 'INSERT INTO `{}`({}) VALUES({})'.format(
+            sql = 'INSERT INTO {}({}) VALUES({})'.format(
                 self.tableName, joinList(columns), pers(len(columns)))
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, dataList))
@@ -258,7 +264,7 @@ class Orm(object):
                 keys, ps, vs = fieldSplit(data)
                 values.append(vs)
 
-            sql = 'INSERT INTO `{}`({}) VALUES({})'.format(
+            sql = 'INSERT INTO {}({}) VALUES({})'.format(
                 self.tableName, keys, ps)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, values))
@@ -301,7 +307,7 @@ class Orm(object):
         try:
             fieldStr, values = fieldStrAndPer(data)
             values.append(primaryValue)
-            sql = 'UPDATE `{}` SET {} WHERE `{}`=%s'.format(
+            sql = 'UPDATE {} SET {} WHERE `{}`=%s'.format(
                 self.tableName, fieldStr, self.keyProperty)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, values))
@@ -341,7 +347,7 @@ class Orm(object):
             whereStr, values1 = example.whereBuilder()
             fieldStr, values2 = fieldStrAndPer(data)
             values2.extend(values1)
-            sql = 'UPDATE `{}` SET {} WHERE {}'.format(
+            sql = 'UPDATE {} SET {} WHERE {}'.format(
                 self.tableName, fieldStr, whereStr)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, values2))
@@ -483,7 +489,7 @@ class Orm(object):
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} {groupByStr} {orderByStr}'''.format(
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} {groupByStr} {orderByStr}'''.format(
                 **strDict)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}'.format(sql))
@@ -517,11 +523,11 @@ class Orm(object):
                 'propertiesStr': self.properties,
                 'tableName': self.tableName,
                 'joinStr': self.joinStr,
-                'whereStr': '`{}`.`{}`=%s'.format(self.tableName, self.keyProperty),
+                'whereStr': '{}.`{}`=%s'.format(self.tableName, self.keyProperty),
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -556,7 +562,7 @@ class Orm(object):
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -597,7 +603,7 @@ class Orm(object):
                 'groupByStr': self.groupByStr,
                 'orderByStr': self.orderByStr
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} , {countStr} FROM `{tableName}` {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} , {countStr} FROM {tableName} {joinStr} 
                 WHERE {whereStr} {groupByStr} {orderByStr}
                 '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -671,14 +677,14 @@ class Orm(object):
 
         try:
             strDict = {
-                'propertiesStr': '`{}`.`{}`'.format(self.tableName, self.keyProperty),
+                'propertiesStr': '{}.`{}`'.format(self.tableName, self.keyProperty),
                 'tableName': self.tableName,
                 'joinStr': self.joinStr,
                 # 'groupByStr': self.groupByStr,
                 # 'orderByStr': self.orderByStr
             }
 
-            sql = '''SELECT COUNT({propertiesStr}) num FROM `{tableName}` {joinStr} 
+            sql = '''SELECT COUNT({propertiesStr}) num FROM {tableName} {joinStr} 
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}'.format(sql))
@@ -698,7 +704,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr,
                 'limitStr': self._limit(startId, pageNum)
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                     {groupByStr} {orderByStr} {limitStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -726,7 +732,7 @@ class Orm(object):
         try:
             whereStr, values = example.whereBuilder()
             strDict = {
-                'propertiesStr': '`{}`.`{}`'.format(self.tableName, self.keyProperty),
+                'propertiesStr': '{}.`{}`'.format(self.tableName, self.keyProperty),
                 'tableName': self.tableName,
                 'joinStr': self.joinStr,
                 'whereStr': whereStr,
@@ -734,7 +740,7 @@ class Orm(object):
                 # 'orderByStr': self.orderByStr
             }
 
-            sql = '''SELECT COUNT({propertiesStr}) num FROM `{tableName}` {joinStr} 
+            sql = '''SELECT COUNT({propertiesStr}) num FROM {tableName} {joinStr} 
                     WHERE {whereStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -756,7 +762,7 @@ class Orm(object):
                 'orderByStr': self.orderByStr,
                 'limitStr': self._limit(startId, pageNum)
             }
-            sql = '''SELECT {distinctStr} {propertiesStr} FROM `{tableName}` {joinStr} 
+            sql = '''SELECT {distinctStr} {propertiesStr} FROM {tableName} {joinStr} 
                     WHERE {whereStr} {groupByStr} {orderByStr} {limitStr}
                     '''.format(**strDict)
             sql = self._encodeSql(sql)
@@ -784,7 +790,7 @@ class Orm(object):
 
         cursor = self.conn.cursor()
         try:
-            sql = 'DELETE FROM `{}` WHERE `{}`=%s'.format(
+            sql = 'DELETE FROM {} WHERE `{}`=%s'.format(
                 self.tableName, self.keyProperty)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, primaryValue))
@@ -809,7 +815,7 @@ class Orm(object):
         cursor = self.conn.cursor()
         try:
             whereStr, values = example.whereBuilder()
-            sql = 'DELETE FROM `{}` WHERE {}'.format(self.tableName, whereStr)
+            sql = 'DELETE FROM {} WHERE {}'.format(self.tableName, whereStr)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, values))
             res = cursor.execute(sql, values)
