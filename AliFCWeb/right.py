@@ -66,7 +66,7 @@ def updateToken(payload):
     ''' 更新token
     '''
     # 一个月
-    keep = payload.get('keep', 0.5)
+    keep = payload.get('keep', 2)
     unit = payload.get('unit', 'hour')
     payload['exp'] = timeLater(keep, unit)
     return payload
@@ -77,7 +77,7 @@ def encodeToken(data):
     :param data 签名参数
     :return 成功返回加密值，失败返回None
     '''
-    data['exp'] = timeLater(data.pop('keep', 0.5), 'hour')
+    data['exp'] = timeLater(data.get('keep', 2), 'hour')
     token_value = encode(data, getConfByName(RSA_PRIVATE_KEY_FILE_NAME))
     return token_value
 
