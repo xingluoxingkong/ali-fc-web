@@ -5,7 +5,6 @@ from .constant import getConfByName, FC_START_RESPONSE
 
 __all__ = ['ResponseEntity']
 
-
 class ResponseEntity:
 
     def __init__(self, statusCode, res=None, token=None):
@@ -71,6 +70,15 @@ class ResponseEntity:
         --
         '''
         return ResponseEntity('500', res)
+    
+    @staticmethod
+    def strResponseEntity(statusCode, res):
+        ''' 返回原始字符串给前端
+        --
+        '''
+        response = StrResponseEntity(statusCode, res)
+        response.setResType('html')
+        return response
 
     def setResType(self, resType):
         ''' 设置返回值类型
@@ -83,9 +91,8 @@ class ResponseEntity:
         elif resType == 'html':
             self.header([('Content-type', 'text/html')])
         else:
-            return self
+            self.resType = resType
 
-        self.resType = resType
         return self
 
     def header(self, response_headers=[('Content-type', 'application/json')]):
@@ -186,3 +193,12 @@ class ResponseEntity:
 
     def __str__(self):
         return json.dumps({'status':self.statusCode, 'res':str(self.res)}) 
+
+
+class StrResponseEntity(ResponseEntity):
+    def build(self, token = None):
+        start_response = getConfByName(FC_START_RESPONSE)
+        start_response(self.statusCode, self.response_headers)
+        if not isinstance(self.res, str):
+            self.res = str(self.res)
+        return [self.res.encode()]

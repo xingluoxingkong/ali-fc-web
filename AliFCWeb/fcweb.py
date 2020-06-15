@@ -231,12 +231,12 @@ def _commonHttpEntry(pattern, func, login = False, auth = False, uToken = False)
         if not isLogin(oldToken):
             _log.warning('客户端%s请求:%s接口权限不足' % (http_host, environ['fc.request_uri']))
             res = ResponseEntity.unauthorized('用户未登录，或登录已过期')
+        elif uToken: # 是否需要更新token
+            newToken = updateToken(oldToken)
     if auth:    # 是否需要验证权限
         if not auth(oldToken):
             _log.warning('客户端%s请求:%s接口权限不足' % (http_host ,environ['fc.request_uri']))
             res = ResponseEntity.unauthorized('权限不足')
-    if uToken: # 是否需要更新token
-        newToken = updateToken(oldToken)
     
     if not res: # 登录验证和权限验证都通过了，则执行对应的方法
         res = _commonHttp(pattern, func)
