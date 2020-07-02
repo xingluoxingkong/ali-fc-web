@@ -21,7 +21,7 @@ class Orm(object):
         '''
         if 'psycopg2' in str(type(conn)):
             self.dbType = _POSTGRE
-        elif 'mysql' in str(type(conn)) :
+        elif 'mysql' in str(type(conn)):
             self.dbType = _MYSQL
         else:
             try:
@@ -40,7 +40,8 @@ class Orm(object):
             self.tableName = tableName
         elif '.' in tableName:
             tableNameSplit = tableName.split('.')
-            self.tableName = '`' + tableNameSplit[0] + '`.`' + tableNameSplit[1] + '`'
+            self.tableName = '`' + \
+                tableNameSplit[0] + '`.`' + tableNameSplit[1] + '`'
         else:
             self.tableName = '`' + tableName + '`'
         # 主键名
@@ -74,7 +75,7 @@ class Orm(object):
         return self
 
     #################################### 新增操作 ####################################
-    def insertData(self, *args):
+    def insertData(self, *args, **kw):
         ''' 向数据库中写入数据
         --
             @example
@@ -88,6 +89,11 @@ class Orm(object):
                         1. dict: 单条数据key,value键值对形式
                         2. list, list: 两个数组形式。第一个数据传入数据库中对应的字段。第二个数组传入需要写入的数据，可以是单条数据（一维数组），也可以是多条数据（二维数组）
                         3. list: 多条数据，数组里面是多个字典，每个字典代表一条数据
+            
+            以下参数仅在插入单条数据时有效：
+            @param kw.ignore: 不存在则新增，存在则不改变
+            @param kw.replace: 不存在则新增，存在则删除并新增
+            @param kw.update: 不存在则新增，存在则更新
         '''
         n = len(args)
         if n == 0:
@@ -96,7 +102,7 @@ class Orm(object):
             if isinstance(args[0], list):
                 return self.insertDictList(args[0])
             elif isinstance(args[0], dict):
-                return self.insertOne(args[0])
+                return self.insertOne(args[0], **kw)
             else:
                 return -1
         elif n == 2:
@@ -104,16 +110,32 @@ class Orm(object):
         else:
             return -1
 
-    def insertOne(self, data):
+    def insertOne(self, data, ignore=False, replace=False, update=False):
         ''' 向数据库写入一条数据，返回自增id（主键必须是自增并且名字为id），或者受影响的条数（没有自增id）
         --
             @example
                 orm.insertOne({'name':'张三', 'age':18})
 
             @param data: 要插入的数据 字典格式
+            @param ignore: 不存在则新增，存在则不改变
+            @param replace: 不存在则新增，存在则删除并新增
+            @param update: 不存在则新增，存在则更新
         '''
         if not data:
             raise Exception('数据为空！')
+
+        if ignore and replace and update:
+            raise Exception('ignore,replace和update只能有一个为true')
+
+        if ignore:
+            ignore = 'IGNORE'
+        else:
+            ignore = ''
+
+        if replace:
+            replace = 'REPLACE'
+        else:
+            replace = ''
 
         cursor = self.conn.cursor()
         try:
@@ -124,8 +146,13 @@ class Orm(object):
                     data[self.keyProperty] = self.generator()
 
             keys, ps, values = fieldSplit(data)
-            sql = 'INSERT INTO {}({}) VALUES({})'.format(
-                self.tableName, keys, ps)
+            sql = '{} INSERT {} INTO {}({}) VALUES({})'.format(replace, ignore,
+                                                               self.tableName, keys, ps)
+            if update:
+                fieldStr, values2 = fieldStrAndPer(data)
+                sql += ' ON DUPLICATE KEY UPDATE {}'.format(fieldStr)
+                values.extend(values2)
+
             if self.dbType == _POSTGRE and self.keyProperty == PRIMARY_KEY:
                 sql += ' RETURNING {}'.format(self.keyProperty)
             sql = self._encodeSql(sql)
@@ -204,8 +231,9 @@ class Orm(object):
                     else:
                         dataList.append(self.generator())
 
-            sql = 'INSERT INTO {}({}) VALUES({})'.format(
+            sql = 'INSERT  INTO {}({}) VALUES({})'.format(
                 self.tableName, joinList(columns), pers(len(columns)))
+
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, dataList))
             affectedRows = 0
@@ -264,7 +292,7 @@ class Orm(object):
                 keys, ps, vs = fieldSplit(data)
                 values.append(vs)
 
-            sql = 'INSERT INTO {}({}) VALUES({})'.format(
+            sql = ' INSERT INTO {}({}) VALUES({})'.format(
                 self.tableName, keys, ps)
             sql = self._encodeSql(sql)
             _log.info('执行sql语句：{}；值：{}'.format(sql, values))
@@ -514,7 +542,7 @@ class Orm(object):
             import psycopg2
         except Exception as e:
             pass
-        
+
         cursor = self.conn.cursor()
 
         try:

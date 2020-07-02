@@ -1,4 +1,7 @@
-import oss2
+try:
+    import oss2
+except Exception as e:
+    pass
 
 __all__ = ['OSSUtils', 'ShanghaiOSS',
            'HangzhouOSS', 'QingdaoOSS',
