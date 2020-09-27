@@ -129,7 +129,7 @@ def dataToJson(data):
     elif isinstance(data, str):
         if data.startswith('{') and data.endswith('}') or data.startswith('[') and data.endswith(']'):
             try:
-                return json.loads(data.replace("'", '"'))
+                return dataToJson(json.loads(data.replace("'", '"')))
             except :
                 return data
         return data
