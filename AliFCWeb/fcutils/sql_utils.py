@@ -1,3 +1,4 @@
+import datetime
 import json
 
 __all__ = ['joinList', 'pers', 'fieldStrFromList',
@@ -144,6 +145,8 @@ def dataToJson(data):
         return data
     elif isinstance(data, Decimal):
         return float(data)
+    elif isinstance(data, (datetime.datetime,datetime.date)):
+        return data.strftime('%Y-%m-%d %H:%M:%S')
     else:
         return str(data)
 
