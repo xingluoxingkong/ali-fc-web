@@ -3,11 +3,28 @@
 # 阿里云短信验证
 #
 ######################################
+import re
 import json
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
 
 __all__ = ['sendMessage']
+
+
+
+def judge_Monile_phone(phone):
+    ''' 判断手机号
+    --
+    '''
+    if len(phone)==11:
+        rp=re.compile('^0\d{2,3}\d{7,8}$|^1[358]\d{9}$|^147\d{8}')
+        phoneMatch = rp.match(phone)
+        if phoneMatch:
+            return True
+        else:
+            return False
+    else:
+        return False
 
 
 def sendMessage(accessKeyId, accessSecret, phoneNumbers, signName, templateCode, templateParam=None):
