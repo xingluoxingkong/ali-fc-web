@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 from .constant import AUTO_INCREMENT_KEYS, PRIMARY_KEY
 from AliFCWeb.fcutils import fieldStrAndPer, fieldSplit, joinList, pers, dataToStr
 
@@ -935,6 +935,27 @@ class Orm(object):
             cursor.close()
 
     #################################### 子查询 ####################################
+    #################################### 清空表 ####################################
+    def truncateTable(self):
+        ''' 清空表
+        --
+        '''
+        cursor = self.conn.cursor()
+        sql = f'TRUNCATE TABLE {self.tableName}'
+        try:
+            
+            _log.info('执行sql语句：{}'.format(sql))
+            res = cursor.execute(sql)
+            if self.auto_commit:
+                self.conn.commit()
+            return res
+        except Exception as e:
+            _log.error(e)
+            self.conn.rollback()
+            raise Exception(
+                'selectOneBySQL error; sql:{}'.format(sql))
+        finally:
+            cursor.close()
 
     #################################### 清除关闭 ####################################
 
